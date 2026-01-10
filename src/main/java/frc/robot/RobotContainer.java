@@ -192,8 +192,8 @@ public class RobotContainer {
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
-    }
+      driverXbox.rightBumper().onTrue(Commands.runOnce(() -> System.out.println("X: " + drivebase.getPose().getX() + ", Y: " + drivebase.getPose().getY() + ", Rotation(deg): " + drivebase.getPose().getRotation().getDegrees())));
+    } 
 
   }
 

@@ -69,4 +69,6 @@ public final class Constants {
 
     public static Transform3d ROBOT_TO_QUEST = new Transform3d(0.0, 6.0, 6.0, new Rotation3d(0.0, 0.0, 0.0));
   }
+
+  public static double[][] REEF_POSES = {{14.41396}, {3.51962}, {0.0}};
 }
