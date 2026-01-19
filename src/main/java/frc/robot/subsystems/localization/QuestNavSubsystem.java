@@ -14,9 +14,9 @@ public class QuestNavSubsystem extends SubsystemBase{
 
     QuestNav questNav;
     SwerveSubsystem swerveSubsystem;
-    ApriltagLL limelight;
+    LimelightSubsystem limelight;
 
-    public QuestNavSubsystem(QuestNav questNav, SwerveSubsystem swerve, ApriltagLL limelight) {
+    public QuestNavSubsystem(QuestNav questNav, SwerveSubsystem swerve, LimelightSubsystem limelight) {
         this.questNav = questNav;
         this.swerveSubsystem = swerve;
         this.limelight = limelight;

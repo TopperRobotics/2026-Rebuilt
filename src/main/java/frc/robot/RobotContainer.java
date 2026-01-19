@@ -21,8 +21,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.localization.ApriltagLL;
+import frc.robot.subsystems.localization.LimelightSubsystem;
+import frc.robot.subsystems.localization.PathfindingSubsystem;
 import frc.robot.subsystems.localization.QuestNavSubsystem;
+import frc.robot.subsystems.mechanisms.IntakeSubsystem;
+import frc.robot.subsystems.mechanisms.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import gg.questnav.questnav.QuestNav;
 
@@ -40,13 +43,17 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  final CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController driverXbox = new CommandXboxController(2);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/neo"));
-  private ApriltagLL limelight = new ApriltagLL();
+  private LimelightSubsystem limelight = new LimelightSubsystem();
   private QuestNav questNav = new QuestNav();
   private QuestNavSubsystem questNavSubsystem = new QuestNavSubsystem(questNav, drivebase, limelight);
+  private IntakeSubsystem intake = new IntakeSubsystem();
+  private ShooterSubsystem shooter = new ShooterSubsystem();
+  private PathfindingSubsystem pathfinder = new PathfindingSubsystem();
+  
 
   // Establish a Sendable Chooser that will be able to be sent to the
   // SmartDashboard, allowing selection of desired auto
@@ -152,49 +159,13 @@ public class RobotContainer {
     Command driveRobotOrientedAngularVelocity = drivebase.driveFieldOriented(driveRobotOriented);
     Command driveFieldOrientedDirectAngleKeyboard = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
     Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
-
-    if (RobotBase.isSimulation()) {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
-    } else {
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    }
-
-    if (Robot.isSimulation()) {
-      Pose2d target = new Pose2d(new Translation2d(1, 4),
-          Rotation2d.fromDegrees(90));
-      // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
-      driveDirectAngleKeyboard.driveToPose(() -> target,
-          new ProfiledPIDController(5,
-              0,
-              0,
-              new Constraints(5, 2)),
-          new ProfiledPIDController(5,
-              0,
-              0,
-              new Constraints(Units.degreesToRadians(360),
-                  Units.degreesToRadians(180))));
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-      driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-      driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
-          () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
-
-    }
-    if (DriverStation.isTest()) {
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
-
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.rightBumper().onTrue(Commands.none());
-    } else {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.start().whileTrue(Commands.none());
-      driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.runOnce(() -> System.out.println("X: " + drivebase.getPose().getX() + ", Y: " + drivebase.getPose().getY() + ", Rotation(deg): " + drivebase.getPose().getRotation().getDegrees())));
-    } 
-
+    
+    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    // Deploy the intake with the X button and start intake roller
+    driverXbox.x().onTrue(intake.moveToPosition(new Rotation2d(Math.toRadians(90)), true));
+    // Retract the intake with the Y button and stop intake roller
+    driverXbox.y().onTrue(intake.moveToPosition(new Rotation2d(Math.toRadians(-4.0)), false));
+    driverXbox.a().onTrue(Commands.runOnce(() -> drivebase.resetPose(drivebase.getPose()))); // for sim, comment out when running on real robot
   }
 
   /**

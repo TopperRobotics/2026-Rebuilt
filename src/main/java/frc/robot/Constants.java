@@ -69,6 +69,42 @@ public final class Constants {
 
     public static Transform3d ROBOT_TO_QUEST = new Transform3d(0.0, 6.0, 6.0, new Rotation3d(0.0, 0.0, 0.0));
   }
+  // x, y, degrees
+  public static double[][] SCORING_POSES = {
+    {14.41396, 3.51962, 0.0}, 
+    {0.0, 0.0, 0.0}, 
+    {0.0, 0.0, 0.0}
+  };
 
-  public static double[][] REEF_POSES = {{14.41396}, {3.51962}, {0.0}};
+  public static final class intake {
+    public static final double kP = 0.05;
+    public static final double kI = 0.0;
+    public static final double kD = 0.01;
+    public static final int tolerance = 1;
+    public static final int velocityTolerance = 1;
+  }
+
+  public static final class intakeArm {
+    public static final int rotMotorID = 5;
+    public static final double gearRatio = 100.0;
+
+    // PID gains
+    public static final double kP = 0.005;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0001;
+
+    // Feedforward gains
+    public static final double kS = 0.0; // Static friction
+    public static final double kG = 0.3; // Gravity compensation
+    public static final double kV = 0.0; // Velocity feedforward
+    public static final double kA = 0.0; // Acceleration feedforward
+
+    // Motion profile constraints
+    public static final double maxVelocity = 2.0; // degrees per second
+    public static final double maxAcceleration = 1.0; // degrees per second squared
+
+    public static final double tolerance = 0.1; // Position tolerance in degrees
+    public static final double velocityTolerance = 1.0; // Velocity tolerance in deg/sec
+  }
+  
 }
