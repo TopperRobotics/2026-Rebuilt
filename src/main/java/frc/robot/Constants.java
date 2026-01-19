@@ -6,8 +6,10 @@ package frc.robot;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -85,7 +87,7 @@ public final class Constants {
   }
 
   public static final class intakeArm {
-    public static final int rotMotorID = 5;
+    public static final int rotMotorID = 25;
     public static final double gearRatio = 100.0;
 
     // PID gains
@@ -105,6 +107,21 @@ public final class Constants {
 
     public static final double tolerance = 0.1; // Position tolerance in degrees
     public static final double velocityTolerance = 1.0; // Velocity tolerance in deg/sec
+
+    public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(-4.0));
+    public static final Rotation2d deployedPosition = new Rotation2d(Math.toRadians(90.0));
+  }
+
+  public static final class FieldConstants {
+    public static final Translation2d kLeftHopper = new Translation2d(
+        Units.inchesToMeters(180.11), // X distance from Blue Wall
+        Units.inchesToMeters(158.84)  // Y distance from Right side
+    );
+
+    public static final Translation2d kRightHopper = new Translation2d(
+        Units.inchesToMeters(467.11), 
+        Units.inchesToMeters(158.84)
+    );
   }
   
 }

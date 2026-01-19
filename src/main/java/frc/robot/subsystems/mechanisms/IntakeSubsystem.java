@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.mechanisms;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -28,12 +28,12 @@ public class IntakeSubsystem extends SubsystemBase {
     public IntakeSubsystem() {
         // Initialize intake arm motor
         intakeArmMotor = new SparkMax(
-            5,
+            25,
             MotorType.kBrushless
         );
         
         // Initialize intake roller motors
-        intakeMotor = new SparkFlex(4, MotorType.kBrushless);
+        intakeMotor = new SparkFlex(24, MotorType.kBrushless);
 
         // Configure motor settings using SparkMaxConfig
         SparkMaxConfig config = new SparkMaxConfig();

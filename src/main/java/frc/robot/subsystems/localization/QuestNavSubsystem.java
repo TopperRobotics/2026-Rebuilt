@@ -3,6 +3,7 @@ package frc.robot.subsystems.localization;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.QuestNavConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -33,6 +34,9 @@ public class QuestNavSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("Swerve angular velocity radps", swerveSubsystem.getFieldVelocity().omegaRadiansPerSecond);
+        SmartDashboard.putNumber("Swerve y velocity mps", swerveSubsystem.getFieldVelocity().vxMetersPerSecond);
+        SmartDashboard.putNumber("Swerve x velocity mps", swerveSubsystem.getFieldVelocity().vyMetersPerSecond);
 
         // Get the latest pose data frames from the Quest
         PoseFrame[] questFrames = questNav.getAllUnreadPoseFrames();

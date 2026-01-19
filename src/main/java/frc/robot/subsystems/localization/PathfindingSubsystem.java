@@ -2,7 +2,6 @@ package frc.robot.subsystems.localization;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
@@ -21,10 +20,6 @@ public class PathfindingSubsystem extends SubsystemBase {
 
     public Command pathfindToPose(Pose2d targetPose){
         return AutoBuilder.pathfindToPose(targetPose, constraints);
-    }
-
-    public Command pathfindToPathAndFollowIt(PathPlannerPath targetPath){
-        return AutoBuilder.pathfindThenFollowPath(targetPath, constraints);
     }
     
 }

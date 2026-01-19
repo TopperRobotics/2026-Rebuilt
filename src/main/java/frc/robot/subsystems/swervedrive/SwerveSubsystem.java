@@ -94,7 +94,8 @@ public class SwerveSubsystem extends SubsystemBase {
           (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE
                                                                 // ChassisSpeeds. Also optionally outputs individual
                                                                 // module feedforwards
-          new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic
+          new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
+                                          // holonomic
                                           // drive trains
               new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
               new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
@@ -133,13 +134,15 @@ public class SwerveSubsystem extends SubsystemBase {
         new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
             Rotation2d.fromDegrees(0)));
 
-    //RobotConfig config = RobotConfig.fromGUISettings();
-    /*try{
-      config = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      // Handle exception as needed
-      e.printStackTrace();
-    }*/
+    // RobotConfig config = RobotConfig.fromGUISettings();
+    /*
+     * try{
+     * config = RobotConfig.fromGUISettings();
+     * } catch (Exception e) {
+     * // Handle exception as needed
+     * e.printStackTrace();
+     * }
+     */
 
     try {
       AutoBuilder.configure(
@@ -149,7 +152,8 @@ public class SwerveSubsystem extends SubsystemBase {
           (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE
                                                                 // ChassisSpeeds. Also optionally outputs individual
                                                                 // module feedforwards
-          new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic
+          new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
+                                          // holonomic
                                           // drive trains
               new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
               new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
@@ -175,15 +179,15 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
-  public void resetPose(Pose2d pose){
+  public void resetPose(Pose2d pose) {
     this.resetOdometry(pose);
   }
 
-  public ChassisSpeeds getRobotRelativeSpeeds(){
+  public ChassisSpeeds getRobotRelativeSpeeds() {
     return this.getRobotVelocity();
   }
 
-  public void driveRobotRelative(ChassisSpeeds speeds){
+  public void driveRobotRelative(ChassisSpeeds speeds) {
     this.drive(speeds);
   }
 
@@ -577,4 +581,41 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveDrive getSwerveDrive() {
     return swerveDrive;
   }
+
+  /**
+   * Calculates the required Pose2d to face the hopper.
+   * 
+   * @param robotPose         The current Pose2d of the robot
+   * @param hopperTranslation The Translation2d of the hopper coordinates
+   * @return A Pose2d at the current location but rotated toward the hopper
+   */
+  public Pose2d getPoseFacingHopper(Pose2d robotPose, Translation2d hopperTranslation) {
+
+    // 1. Calculate the vector from the robot to the hopper
+    // Subtract robot position from hopper position
+    Translation2d targetVector = hopperTranslation.minus(robotPose.getTranslation());
+
+    // 2. Calculate the angle of that vector
+    // Rotation2d has a built-in constructor for this!
+    // It uses atan2(y, x) internally.
+    Rotation2d targetRotation = new Rotation2d(targetVector.getX(), targetVector.getY());
+
+    // 3. Return a new Pose2d at the same spot, but with the new rotation
+    return new Pose2d(robotPose.getTranslation(), targetRotation);
+  }
+
+  /*public double rotationSupplierToHopper() {
+    // Inside your Command or Teleop loop:
+    Pose2d targetPose = DriveUtils.getPoseFacingHopper(m_drive.getPose(), hopperLocation);
+
+    // Use a ProfiledPIDController to calculate the rotation speed needed to reach
+    // targetRotation
+    double rotationOutput = m_headingPID.calculate(
+        m_drive.getPose().getRotation().getRadians(),
+        targetPose.getRotation().getRadians());
+
+  return rotationOutput;
+  
+  }*/
+
 }
