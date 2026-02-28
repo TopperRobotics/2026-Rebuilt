@@ -37,7 +37,11 @@ public final class Constants {
   public static final double MAX_SPEED = Units.feetToMeters(14.5);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
-  public static final String LIMELIGHT_IP_ADDRESS = "10.39.84.11"; 
+  // the two limelights are named x and y because one is mounted on the
+  // x-axis and the other is mounted on the y-axis, two are needed to get an accurate global pose estimate
+  public static final String LIMELIGHT_X_IP_ADDRESS = "10.39.84.11"; 
+  public static final String LIMELIGHT_Y_IP_ADDRESS = "10.39.84.12";
+
   // public static final class AutonConstants
   // {
   //
@@ -110,6 +114,35 @@ public final class Constants {
 
     public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(-4.0));
     public static final Rotation2d deployedPosition = new Rotation2d(Math.toRadians(90.0));
+  }
+
+  public static final class shooter {
+
+  }
+
+  public static final class shooterHood {
+    public static final double gearRatio = 1.0;
+
+    // PID gains
+    public static final double kP = 0.005;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0001;
+
+    // Feedforward gains
+    public static final double kS = 0.0; // Static friction
+    public static final double kG = 0.0; // Gravity compensation
+    public static final double kV = 0.0; // Velocity feedforward
+    public static final double kA = 0.0; // Acceleration feedforward
+
+    // Motion profile constraints
+    public static final double maxVelocity = 2.0; // degrees per second
+    public static final double maxAcceleration = 1.0; // degrees per second squared
+
+    public static final double tolerance = 0.1; // Position tolerance in degrees
+    public static final double velocityTolerance = 1.0; // Velocity tolerance in deg/sec
+
+    public static final double forwardSoftLimit = 35; // degrees
+    public static final double reverseSoftLimit = 0;
   }
 
   public static final class FieldConstants {

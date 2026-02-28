@@ -604,18 +604,4 @@ public class SwerveSubsystem extends SubsystemBase {
     return new Pose2d(robotPose.getTranslation(), targetRotation);
   }
 
-  /*public double rotationSupplierToHopper() {
-    // Inside your Command or Teleop loop:
-    Pose2d targetPose = DriveUtils.getPoseFacingHopper(m_drive.getPose(), hopperLocation);
-
-    // Use a ProfiledPIDController to calculate the rotation speed needed to reach
-    // targetRotation
-    double rotationOutput = m_headingPID.calculate(
-        m_drive.getPose().getRotation().getRadians(),
-        targetPose.getRotation().getRadians());
-
-  return rotationOutput;
-  
-  }*/
-
 }
