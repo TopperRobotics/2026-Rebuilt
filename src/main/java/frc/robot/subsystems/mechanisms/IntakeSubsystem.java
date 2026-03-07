@@ -18,20 +18,28 @@ import frc.robot.Constants;
 public class IntakeSubsystem extends SubsystemBase {
     
     // Motor controllers and related objects
-    private SparkMax intakeArmMotor;
-    private RelativeEncoder intakeArmEncoder;
-    private SparkClosedLoopController intakeArmPID;
-    private SparkFlex intakeMotor;
+    private SparkMax intakeArmLeftMotor;
+    private RelativeEncoder intakeArmLeftMotorEncoder;
+    private SparkMax intakeArmRightMotor; // the right motor is inverted
+    private RelativeEncoder intakeArmRightMotorEncoder;
+    private SparkClosedLoopController intakeArmLeftMotorPID;
+    private SparkClosedLoopController intakeArmRightMotorPID;
+    private SparkFlex intakeRollerMotor;
 
     public IntakeSubsystem() {
         // Initialize intake arm motor
-        intakeArmMotor = new SparkMax(
-            25,
+        intakeArmLeftMotor = new SparkMax(
+            8,
+            MotorType.kBrushless
+        );
+
+        intakeArmRightMotor = new SparkMax(
+            11,
             MotorType.kBrushless
         );
         
         // Initialize intake roller motors
-        intakeMotor = new SparkFlex(24, MotorType.kBrushless);
+        intakeRollerMotor = new SparkFlex(12, MotorType.kBrushless);
 
         // Configure motor settings using SparkMaxConfig
         SparkMaxConfig config = new SparkMaxConfig();
@@ -47,19 +55,33 @@ public class IntakeSubsystem extends SubsystemBase {
         config.closedLoop
             .pid(Constants.intakeArm.kP, Constants.intakeArm.kI, Constants.intakeArm.kD);
         
-        // Apply configuration to motor
-        intakeArmMotor.configure(
+        // Apply configuration to left motor
+        intakeArmLeftMotor.configure(
+            config, 
+            SparkMax.ResetMode.kResetSafeParameters, 
+            SparkMax.PersistMode.kPersistParameters
+        );
+
+        // invert right motor after burning config to left motor
+        config.inverted(true);
+
+        // Apply configuration to right motor
+        intakeArmRightMotor.configure(
             config, 
             SparkMax.ResetMode.kResetSafeParameters, 
             SparkMax.PersistMode.kPersistParameters
         );
         
         // Get encoder and PID references after configuration
-        intakeArmEncoder = intakeArmMotor.getEncoder();
-        intakeArmPID = intakeArmMotor.getClosedLoopController();
+        intakeArmLeftMotorEncoder = intakeArmLeftMotor.getEncoder();
+        intakeArmLeftMotorPID = intakeArmLeftMotor.getClosedLoopController();
+
+        intakeArmRightMotorEncoder = intakeArmRightMotor.getEncoder();
+        intakeArmRightMotorPID = intakeArmRightMotor.getClosedLoopController();
         
         // Reset encoder position to zero
-        intakeArmEncoder.setPosition(0);
+        intakeArmLeftMotorEncoder.setPosition(0);
+        intakeArmRightMotorEncoder.setPosition(0);
     }
     
     // COMMANDS FOR INTAKE ROLLERS
@@ -69,7 +91,7 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public Command out() {
          return run(() -> {
-            intakeMotor.set(-0.4); 
+            intakeRollerMotor.set(-0.4); 
          });
     }
     
@@ -78,7 +100,7 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public Command in() {
         return run(() -> {
-            intakeMotor.set(0.4); 
+            intakeRollerMotor.set(0.4); 
         });
     }
     
@@ -87,7 +109,7 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public Command stop() {
         return run(() -> {
-            intakeMotor.stopMotor();
+            intakeRollerMotor.stopMotor();
         });
     }
 
@@ -97,7 +119,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * Get current arm position as Rotation2d
      */
     public Rotation2d getPosition() {
-        return Rotation2d.fromDegrees(intakeArmEncoder.getPosition());
+        return Rotation2d.fromDegrees(intakeArmLeftMotorEncoder.getPosition());
     }
     
     /**
@@ -111,9 +133,14 @@ public class IntakeSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(error);
     }
 
+    /**
+     * Stops the arm wherever it is
+     * @return
+     */
     public Command stopArm() {
         return run(() -> {
-            intakeArmMotor.stopMotor();
+            intakeArmLeftMotor.stopMotor();
+            intakeArmRightMotor.stopMotor();
         });
     }
 
@@ -129,7 +156,8 @@ public class IntakeSubsystem extends SubsystemBase {
      * @param goal Target position in degrees
      */
     public void goToPosition(Rotation2d goal) {
-        intakeArmPID.setSetpoint(goal.getDegrees(), SparkBase.ControlType.kPosition);
+        intakeArmLeftMotorPID.setSetpoint(goal.getDegrees(), SparkBase.ControlType.kPosition);
+        intakeArmRightMotorPID.setSetpoint(goal.getDegrees(), SparkBase.ControlType.kPosition);
     }
     
     /**
@@ -164,7 +192,8 @@ public class IntakeSubsystem extends SubsystemBase {
     public void periodic() {
         // Update SmartDashboard with current arm position
         SmartDashboard.putNumber("Intake/Current Position", getPosition().getDegrees());
-        SmartDashboard.putNumber("Intake/Target", intakeArmPID.getSetpoint());
+        SmartDashboard.putNumber("Intake/Target Left Motor", intakeArmLeftMotorPID.getSetpoint());
+        SmartDashboard.putNumber("Intake/Target Right Motor", intakeArmLeftMotorPID.getSetpoint());
         // Optional: Add more debugging info
         // SmartDashboard.putNumber("Intake/Error", getError(getPosition()).getDegrees());
         // SmartDashboard.putBoolean("Intake/At Setpoint", 

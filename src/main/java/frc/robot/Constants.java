@@ -92,7 +92,7 @@ public final class Constants {
 
   public static final class intakeArm {
     public static final int rotMotorID = 25;
-    public static final double gearRatio = 100.0;
+    public static final double gearRatio = 48.0;
 
     // PID gains
     public static final double kP = 0.005;

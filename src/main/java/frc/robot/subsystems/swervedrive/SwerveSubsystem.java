@@ -231,7 +231,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return a Command that centers the modules of the SwerveDrive subsystem
    */
   public Command centerModulesCommand() {
-    return run(() -> Arrays.asList(swerveDrive.getModules())
+    return runOnce(() -> Arrays.asList(swerveDrive.getModules())
         .forEach(it -> it.setAngle(0.0)));
   }
 

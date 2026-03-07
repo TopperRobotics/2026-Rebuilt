@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -129,6 +130,8 @@ public class RobotContainer {
                                                                                                                  // one
                                                                                                                  // is
                                                                                                                  // used
+                Command driveDirectAngleCommand = drivebase.driveFieldOriented(driveDirectAngle);
+                Command driveRobotRelativeCommand = Commands.run(()->drivebase.driveRobotRelative(driveRobotOriented.get()));
 
                 drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
                 // Deploy the intake with the X button and start intake roller
@@ -143,11 +146,15 @@ public class RobotContainer {
                                         autoAim.aimAtTarget();
                                 }));
 
-                driverXbox.a().onTrue(Commands.runOnce(() -> drivebase.resetPose(drivebase.getPose()))); // for sim,
+                //driverXbox.a().onTrue(Commands.runOnce(() -> drivebase.resetPose(drivebase.getPose()))); // for sim,
                                                                                                          // comment out
                                                                                                          // when running
                                                                                                          // on real
                                                                                                          // robot
+
+                driverXbox.b().onTrue(drivebase.centerModulesCommand());
+                driverXbox.y().onTrue(Commands.runOnce(()->drivebase.setDefaultCommand(driveDirectAngleCommand)));
+                driverXbox.x().onTrue(Commands.runOnce(()->drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity)));
         }
 
         /**
