@@ -11,8 +11,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
     // bang bang
     double desiredFlywheelSpeed;
-    SparkFlex shooterMotor = new SparkFlex(12, MotorType.kBrushless);
+    SparkFlex shooterMotor = new SparkFlex(15, MotorType.kBrushless);
     RelativeEncoder shooterMotorEncoder = shooterMotor.getEncoder();
+    SparkMax beltMotor = new SparkMax(14, MotorType.kBrushless);
 
     public ShooterSubsystem() {
         this.desiredFlywheelSpeed = 50.96; // the ball needs to be launched at 8 m/s, with the formula v_ball = 1/2 RPM
@@ -29,6 +30,17 @@ public class ShooterSubsystem extends SubsystemBase {
         } else {
             shooterMotor.stopMotor();
         }
+        try{
+            wait(60);
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        beltMotor.set(1);
+    }
+
+    public void stop() {
+        shooterMotor.stopMotor();
+        beltMotor.stopMotor();
     }
 
 }

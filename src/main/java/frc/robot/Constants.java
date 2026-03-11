@@ -34,7 +34,7 @@ public final class Constants {
                                                                    // for fun
   public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED = Units.feetToMeters(14.5);
+  public static final double MAX_SPEED = Units.feetToMeters(20);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
   // the two limelights are named x and y because one is mounted on the
@@ -112,8 +112,8 @@ public final class Constants {
     public static final double tolerance = 0.1; // Position tolerance in degrees
     public static final double velocityTolerance = 1.0; // Velocity tolerance in deg/sec
 
-    public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(-4.0));
-    public static final Rotation2d deployedPosition = new Rotation2d(Math.toRadians(90.0));
+    public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(0.0));
+    public static final Rotation2d deployedPosition = new Rotation2d(Math.toRadians(99.0));
   }
 
   public static final class shooter {
@@ -156,5 +156,14 @@ public final class Constants {
         Units.inchesToMeters(158.84)
     );
   }
-  
+
+  public static final class climber {
+    public static final double gearRatio = 45.0;
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double tolerance = 0;
+    public static final double retractedPosition = 0;
+    public static final double extendedPosition = 0;
+  }
 }

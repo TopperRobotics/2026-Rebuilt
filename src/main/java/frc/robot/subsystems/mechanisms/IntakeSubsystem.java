@@ -55,15 +55,14 @@ public class IntakeSubsystem extends SubsystemBase {
         config.closedLoop
             .pid(Constants.intakeArm.kP, Constants.intakeArm.kI, Constants.intakeArm.kD);
         
+        config.inverted(true);
+        
         // Apply configuration to left motor
         intakeArmLeftMotor.configure(
             config, 
             SparkMax.ResetMode.kResetSafeParameters, 
             SparkMax.PersistMode.kPersistParameters
         );
-
-        // invert right motor after burning config to left motor
-        config.inverted(true);
 
         // Apply configuration to right motor
         intakeArmRightMotor.configure(
@@ -118,8 +117,12 @@ public class IntakeSubsystem extends SubsystemBase {
     /**
      * Get current arm position as Rotation2d
      */
-    public Rotation2d getPosition() {
+    public Rotation2d getPositionLeft() {
         return Rotation2d.fromDegrees(intakeArmLeftMotorEncoder.getPosition());
+    }
+
+    public Rotation2d getPositionRight() {
+        return Rotation2d.fromDegrees(intakeArmRightMotorEncoder.getPosition());
     }
     
     /**
@@ -128,7 +131,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return Error as Rotation2d
      */
     public Rotation2d getError(Rotation2d goal) {
-        Rotation2d currentPos = getPosition();
+        Rotation2d currentPos = getPositionLeft();
         double error = currentPos.getDegrees() - goal.getDegrees();
         return Rotation2d.fromDegrees(error);
     }
@@ -187,11 +190,11 @@ public class IntakeSubsystem extends SubsystemBase {
     }
     
     // PERIODIC METHOD
-    
     @Override
     public void periodic() {
         // Update SmartDashboard with current arm position
-        SmartDashboard.putNumber("Intake/Current Position", getPosition().getDegrees());
+        SmartDashboard.putNumber("Intake/Current Position Left Motor", getPositionLeft().getDegrees());
+        SmartDashboard.putNumber("Intake/Current Position Right Motor", getPositionRight().getDegrees());
         SmartDashboard.putNumber("Intake/Target Left Motor", intakeArmLeftMotorPID.getSetpoint());
         SmartDashboard.putNumber("Intake/Target Right Motor", intakeArmLeftMotorPID.getSetpoint());
         // Optional: Add more debugging info

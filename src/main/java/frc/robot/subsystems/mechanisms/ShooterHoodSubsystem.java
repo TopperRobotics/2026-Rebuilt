@@ -31,7 +31,7 @@ public class ShooterHoodSubsystem extends SubsystemBase {
         this.hopperPosition = hopperPosition;
         this.swerveSubsystem = swerveSubsystem;
 
-        hoodMotor = new SparkMax(25, MotorType.kBrushless);
+        hoodMotor = new SparkMax(7, MotorType.kBrushless);
 
         // Configure motor settings using SparkMaxConfig
         SparkMaxConfig config = new SparkMaxConfig();
@@ -117,8 +117,9 @@ public class ShooterHoodSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        determineDistanceFromTarget();
-        putDistanceFromTargetOnNT();
-        retrieveNeededHoodAngleFromNT();
+        // determineDistanceFromTarget();
+        // putDistanceFromTargetOnNT();
+        // retrieveNeededHoodAngleFromNT();
+        SmartDashboard.putNumber("Shooter Hood/Current Positionr", hoodMotorEncoder.getPosition());
     }
 }

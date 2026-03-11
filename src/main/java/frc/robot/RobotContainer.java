@@ -39,10 +39,10 @@ public class RobotContainer {
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                         "swerve/neo"));
-        //private IntakeSubsystem intake = new IntakeSubsystem();
-        //private ShooterSubsystem shooter = new ShooterSubsystem();
+        private IntakeSubsystem intake = new IntakeSubsystem();
+        private ShooterSubsystem shooter = new ShooterSubsystem();
         //private PathfindingSubsystem pathfinder = new PathfindingSubsystem();
-        //private ShooterHoodSubsystem shooterHood;
+        private ShooterHoodSubsystem shooterHood;
         private AutoAimingSubsystem autoAim;
 
         Translation2d hopperPosition;
@@ -120,7 +120,7 @@ public class RobotContainer {
                         hopperPosition = Constants.FieldConstants.kRightHopper;
                 }
 
-                //shooterHood = new ShooterHoodSubsystem(hopperPosition, drivebase);
+                shooterHood = new ShooterHoodSubsystem(hopperPosition, drivebase);
                 autoAim = new AutoAimingSubsystem(drivebase, hopperPosition, driverXbox);
                 //drivebase.getSwerveDrive().setAutoCenteringModules(true);
         }
@@ -140,11 +140,11 @@ public class RobotContainer {
                 //driverXbox.y().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
 
                 // Aim at target continuously while allowing driver movement
-                driverXbox.leftTrigger()
-                                .whileTrue(Commands.run(() -> {
+                //driverXbox.leftTrigger()
+                //                .whileTrue(Commands.run(() -> {
                 //                        shooterHood.autoAdjustHood();
-                                        autoAim.aimAtTarget();
-                                }));
+                //                        autoAim.aimAtTarget();
+                //                }));
 
                 //driverXbox.a().onTrue(Commands.runOnce(() -> drivebase.resetPose(drivebase.getPose()))); // for sim,
                                                                                                          // comment out
@@ -152,9 +152,14 @@ public class RobotContainer {
                                                                                                          // on real
                                                                                                          // robot
 
-                driverXbox.b().onTrue(drivebase.centerModulesCommand());
-                driverXbox.y().onTrue(Commands.runOnce(()->drivebase.setDefaultCommand(driveDirectAngleCommand)));
-                driverXbox.x().onTrue(Commands.runOnce(()->drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity)));
+                driverXbox.povUp().onTrue(drivebase.centerModulesCommand());
+                //driverXbox.y().onTrue(Commands.runOnce(()->drivebase.setDefaultCommand(driveDirectAngleCommand)));
+                //driverXbox.x().onTrue(Commands.runOnce(()->drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity)));
+
+                driverXbox.a().onTrue(Commands.runOnce(()->shooter.run()));
+                driverXbox.a().onFalse(Commands.runOnce(()->shooter.stop()));
+                driverXbox.b().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, true));
+                driverXbox.x().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
         }
 
         /**
