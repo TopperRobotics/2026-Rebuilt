@@ -163,7 +163,7 @@ public final class Constants {
     public static final double kI = 0;
     public static final double kD = 0;
     public static final double tolerance = 0;
-    public static final double retractedPosition = 0;
-    public static final double extendedPosition = 0;
+    public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(0));
+    public static final Rotation2d extendedPosition = new Rotation2d(Math.toRadians(0));;
   }
 }

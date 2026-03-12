@@ -20,15 +20,15 @@ public class ShooterHoodSubsystem extends SubsystemBase {
     private double distanceFromTarget = 0.000;
     private double neededHoodAngle = Constants.shooterHood.reverseSoftLimit;
 
-    private Translation2d hopperPosition;
+    private Translation2d hopperPosition = new Translation2d();
     private SwerveSubsystem swerveSubsystem;
 
     private SparkMax hoodMotor;
     private RelativeEncoder hoodMotorEncoder;
     private SparkClosedLoopController hoodPID;
 
-    public ShooterHoodSubsystem(Translation2d hopperPosition, SwerveSubsystem swerveSubsystem) {
-        this.hopperPosition = hopperPosition;
+    public ShooterHoodSubsystem(Translation2d[] hopperPositions, SwerveSubsystem swerveSubsystem) {
+        this.hopperPosition = determineClosestTranslation2d(hopperPositions, swerveSubsystem.getPose().getX(), swerveSubsystem.getPose().getY());
         this.swerveSubsystem = swerveSubsystem;
 
         hoodMotor = new SparkMax(7, MotorType.kBrushless);
@@ -84,6 +84,27 @@ public class ShooterHoodSubsystem extends SubsystemBase {
     public void setDistanceFromTarget(double distance) {
         this.distanceFromTarget = distance;
     }
+
+    public Translation2d determineClosestTranslation2d(Translation2d[] translations, double x, double y) {
+                if (translations == null || translations.length == 0) {
+                        System.out.println("shooterhoodsubsystem determineclosesttranslation2d translations parameter null or empty");
+                        return null;
+                }
+
+                Translation2d closest = translations[0];
+                double minDistSq = Math.pow(closest.getX() - x, 2) + Math.pow(closest.getY() - y, 2);
+
+                for (int i = 1; i < translations.length; i++) {
+                        Translation2d current = translations[i];
+                        double distSq = Math.pow(current.getX() - x, 2) + Math.pow(current.getY() - y, 2);
+                        if (distSq < minDistSq) {
+                                minDistSq = distSq;
+                                closest = current;
+                        }
+                }
+
+                return closest;
+        }
 
     public void determineDistanceFromTarget() {
         double hopperPositionX = hopperPosition.getX();

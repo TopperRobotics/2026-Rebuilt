@@ -17,12 +17,12 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 
-public class ClimberSystem extends SubsystemBase {
+public class ClimberSubsystem extends SubsystemBase {
     private SparkMax climberMotor;
     private RelativeEncoder climberMotorEncoder;
     private SparkClosedLoopController climberMotorPID;
 
-    public ClimberSystem() {
+    public ClimberSubsystem() {
         climberMotor = new SparkMax(13, MotorType.kBrushless);
 
         SparkMaxConfig config = new SparkMaxConfig();

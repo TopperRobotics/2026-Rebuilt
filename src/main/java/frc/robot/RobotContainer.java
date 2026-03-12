@@ -20,7 +20,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.climber;
 import frc.robot.subsystems.localization.PathfindingSubsystem;
+import frc.robot.subsystems.mechanisms.ClimberSubsystem;
 import frc.robot.subsystems.mechanisms.IntakeSubsystem;
 import frc.robot.subsystems.mechanisms.ShooterHoodSubsystem;
 import frc.robot.subsystems.mechanisms.ShooterSubsystem;
@@ -41,9 +43,10 @@ public class RobotContainer {
                         "swerve/neo"));
         private IntakeSubsystem intake = new IntakeSubsystem();
         private ShooterSubsystem shooter = new ShooterSubsystem();
+        private ClimberSubsystem climber = new ClimberSubsystem();
         //private PathfindingSubsystem pathfinder = new PathfindingSubsystem();
-        private ShooterHoodSubsystem shooterHood;
-        private AutoAimingSubsystem autoAim;
+        private ShooterHoodSubsystem shooterHood = new ShooterHoodSubsystem(new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, drivebase);
+        private AutoAimingSubsystem autoAim = new AutoAimingSubsystem(drivebase, new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, driverXbox);
 
         Translation2d hopperPosition;
 
@@ -102,26 +105,6 @@ public class RobotContainer {
                 if (autoChooser.getSelected() == null) {
                         RobotModeTriggers.autonomous().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
                 }
-
-                // since the robot container object is created when the robot starts up, it has
-                // the potential to not be connected to the field when this runs.
-                // TODO: find a way to ensure the field is connected before getting alliance
-                // data or move this to somewhere that will run only when the field is connected
-                Optional<Alliance> ally = DriverStation.getAlliance();
-                if (ally.isPresent()) {
-                        if (ally.get() == Alliance.Red) {
-                                hopperPosition = Constants.FieldConstants.kLeftHopper;
-                        }
-                        if (ally.get() == Alliance.Blue) {
-                                hopperPosition = Constants.FieldConstants.kRightHopper;
-                        }
-                } else {
-                        // default to blue
-                        hopperPosition = Constants.FieldConstants.kRightHopper;
-                }
-
-                shooterHood = new ShooterHoodSubsystem(hopperPosition, drivebase);
-                autoAim = new AutoAimingSubsystem(drivebase, hopperPosition, driverXbox);
                 //drivebase.getSwerveDrive().setAutoCenteringModules(true);
         }
 
@@ -152,7 +135,7 @@ public class RobotContainer {
                                                                                                          // on real
                                                                                                          // robot
 
-                driverXbox.povUp().onTrue(drivebase.centerModulesCommand());
+                driverXbox.rightBumper().onTrue(drivebase.centerModulesCommand());
                 //driverXbox.y().onTrue(Commands.runOnce(()->drivebase.setDefaultCommand(driveDirectAngleCommand)));
                 //driverXbox.x().onTrue(Commands.runOnce(()->drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity)));
 
@@ -160,6 +143,8 @@ public class RobotContainer {
                 driverXbox.a().onFalse(Commands.runOnce(()->shooter.stop()));
                 driverXbox.b().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, true));
                 driverXbox.x().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
+                driverXbox.povUp().onTrue(climber.moveToPosition(Constants.climber.extendedPosition));
+                driverXbox.povDown().onTrue(climber.moveToPosition(Constants.climber.retractedPosition));
         }
 
         /**
