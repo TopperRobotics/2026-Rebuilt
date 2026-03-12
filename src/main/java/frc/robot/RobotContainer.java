@@ -41,23 +41,16 @@ import swervelib.SwerveInputStream;
 
 public class RobotContainer {
 
-        // Replace with CommandPS4Controller or CommandJoystick if needed
         final CommandXboxController driverXbox = new CommandXboxController(2);
-        // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                         "swerve/neo"));
         private IntakeSubsystem intake = new IntakeSubsystem();
         private ShooterSubsystem shooter = new ShooterSubsystem();
         private ClimberSubsystem climber = new ClimberSubsystem();
-        //private PathfindingSubsystem pathfinder = new PathfindingSubsystem();
         private ShooterHoodSubsystem shooterHood = new ShooterHoodSubsystem(new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, drivebase);
         private AutoAimingSubsystem autoAim = new AutoAimingSubsystem(drivebase, new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, driverXbox);
 
-        Translation2d hopperPosition;
-
-        // Establish a Sendable Chooser that will be able to be sent to the
-        // SmartDashboard, allowing selection of desired auto
-        private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+        private final SendableChooser<Command> autoChooser;
 
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -96,7 +89,10 @@ public class RobotContainer {
                 NamedCommands.registerCommand("StopIntakeRollers", intake.stop());
                 NamedCommands.registerCommand("ExtendClimber", climber.moveToPosition(Constants.climber.extendedPosition));
                 NamedCommands.registerCommand("RetractClimber", climber.moveToPosition(Constants.climber.retractedPosition));
-                //TODO: add shooter commands
+                NamedCommands.registerCommand("RunShooter", shooter.shoot());
+                NamedCommands.registerCommand("StopShooter", shooter.stopShooting());
+        
+                autoChooser = AutoBuilder.buildAutoChooser();
 
                 // Configure the trigger bindings
                 configureBindings();
@@ -105,10 +101,6 @@ public class RobotContainer {
                 autoChooser.setDefaultOption("Do Nothing", Commands.runOnce(drivebase::zeroGyroWithAlliance)
                                 .andThen(Commands.none()));
 
-                // Add a simple auto option to have the robot drive forward for 1 second then
-                // stop
-                autoChooser.addOption("Drive Forward", Commands.runOnce(drivebase::zeroGyroWithAlliance).withTimeout(.2)
-                                .andThen(drivebase.driveForward().withTimeout(1)));
                 // Put the autoChooser on the SmartDashboard
                 SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -124,20 +116,22 @@ public class RobotContainer {
                 drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
                 // Aim at target continuously while allowing driver movement
-                //driverXbox.leftTrigger()
-                //                .whileTrue(Commands.run(() -> {
-                //                        shooterHood.autoAdjustHood();
-                //                        autoAim.aimAtTarget();
-                //                }));
+                driverXbox.leftTrigger()
+                                .whileTrue(Commands.run(() -> {
+                                        shooterHood.autoAdjustHood();
+                                        autoAim.aimAtTarget();
+                                }));
 
                 driverXbox.rightBumper().onTrue(drivebase.centerModulesCommand());
-                driverXbox.a().onTrue(Commands.runOnce(()->shooter.run()));
-                driverXbox.a().onFalse(Commands.runOnce(()->shooter.stop()));
+                driverXbox.a().onTrue(shooter.shoot());
+                driverXbox.a().onFalse(shooter.stopShooting());
                 driverXbox.b().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, true));
                 driverXbox.x().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
                 driverXbox.povUp().onTrue(climber.moveToPosition(Constants.climber.extendedPosition));
                 driverXbox.povDown().onTrue(climber.moveToPosition(Constants.climber.retractedPosition));
                 driverXbox.rightTrigger().whileTrue(driveRobotOriented);
+                driverXbox.povLeft().whileTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(shooterHood.getHoodPosition() - 1))));
+                driverXbox.povRight().whileTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(shooterHood.getHoodPosition() + 1))));
         }
 
         /**

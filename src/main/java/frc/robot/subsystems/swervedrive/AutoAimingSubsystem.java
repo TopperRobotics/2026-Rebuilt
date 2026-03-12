@@ -70,9 +70,9 @@ public class AutoAimingSubsystem extends SubsystemBase {
                                 driverXbox.getLeftX() * 3,
                                 (driverXbox.getLeftY() * -1) * 3);
 
-                SmartDashboard.putNumber("Target oriented angular velocity radps", angularVelocity);
-                SmartDashboard.putNumber("Target oriented y velocity mps", translation.getX());
-                SmartDashboard.putNumber("Target oriented x velocity mps", translation.getY());
+                SmartDashboard.putNumber("AutoAim/Target oriented angular velocity radps", angularVelocity);
+                SmartDashboard.putNumber("AutoAim/Target oriented y velocity mps", translation.getX());
+                SmartDashboard.putNumber("AutoAim/Target oriented x velocity mps", translation.getY());
 
                 // Drive with calculated rotation
                 drivebase.getSwerveDrive().drive(translation, angularVelocity * 5, true, false);

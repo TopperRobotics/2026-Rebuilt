@@ -9,8 +9,10 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -117,30 +119,25 @@ public class ShooterHoodSubsystem extends SubsystemBase {
                 .sqrt(Math.pow(hopperPositionX - robotPoseX, 2) + Math.pow(hopperPositionY - robotPoseY, 2));
     }
 
-    // this is needed because the Hood/Needed Angle key on nt is the needed inital
-    // angle of the ball to hit the target, not what the angle of the hood needs to be
-    // for example, if the robot were right up against the hub, the ball would need
-    // an angle of 85 degrees, which is what the value on nt would be. at 3 m from
-    // the hub,
-    // the ball would need an angle of 71.7262 degrees to hit the target.
-    public double convertBallAngleToHoodAngle() {
-        return Math.abs(neededHoodAngle - 90); // it's really that simple, the hood angle just needs to be the
-                                               // complement of the ball angle to hit the target,
-        // so if the ball needs to be launched at 70 degrees, the hood needs to be at 20
-        // degrees, and if the ball needs to be launched at 85 degrees,
-        // the hood needs to be at 5 degrees.
+    public void autoAdjustHood(){
+        //
     }
 
-    // this is so the hood only adjusts itself when the shooter is running
-    public void autoAdjustHood(){
-        setHoodPosition(convertBallAngleToHoodAngle());
-    } 
+    public Command moveToPosition(Rotation2d goal) {
+        return runOnce(() -> {
+            setHoodPosition(goal.getDegrees());
+        });
+    }
+
+    public double getHoodPosition(){
+        return this.hoodMotorEncoder.getPosition();
+    }
 
     @Override
     public void periodic() {
         // determineDistanceFromTarget();
         // putDistanceFromTargetOnNT();
         // retrieveNeededHoodAngleFromNT();
-        SmartDashboard.putNumber("Shooter Hood/Current Positionr", hoodMotorEncoder.getPosition());
+        SmartDashboard.putNumber("Shooter Hood/Current Position", hoodMotorEncoder.getPosition());
     }
 }

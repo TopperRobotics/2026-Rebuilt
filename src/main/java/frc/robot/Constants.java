@@ -65,16 +65,6 @@ public final class Constants {
     public static final double TURN_CONSTANT = 6;
   }
 
-  // questnav constants
-  public static class QuestNavConstants {
-    public static Matrix<N3, N1> QUESTNAV_STD_DEVS = VecBuilder.fill(
-        0.02, // Trust down to 2cm in X direction
-        0.02, // Trust down to 2cm in Y direction
-        0.035 // Trust down to 2 degrees rotational
-    );
-
-    public static Transform3d ROBOT_TO_QUEST = new Transform3d(0.0, 6.0, 6.0, new Rotation3d(0.0, 0.0, 0.0));
-  }
   // x, y, degrees
   public static double[][] SCORING_POSES = {
     {14.41396, 3.51962, 0.0}, 
@@ -121,7 +111,7 @@ public final class Constants {
   }
 
   public static final class shooterHood {
-    public static final double gearRatio = 1.0;
+    public static final double gearRatio = 3.0;
 
     // PID gains
     public static final double kP = 0.005;
@@ -164,6 +154,6 @@ public final class Constants {
     public static final double kD = 0;
     public static final double tolerance = 0;
     public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(0));
-    public static final Rotation2d extendedPosition = new Rotation2d(Math.toRadians(0));;
+    public static final Rotation2d extendedPosition = new Rotation2d(Math.toRadians(0));
   }
 }

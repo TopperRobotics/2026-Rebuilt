@@ -43,4 +43,16 @@ public class ShooterSubsystem extends SubsystemBase {
         beltMotor.stopMotor();
     }
 
+    public Command shoot(){
+        return runOnce(() -> {
+            run();
+        });
+    }
+
+    public Command stopShooting(){
+        return runOnce(() -> {
+            stop();
+        });
+    }
+
 }
