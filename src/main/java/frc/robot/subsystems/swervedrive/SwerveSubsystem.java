@@ -365,6 +365,16 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
+  public void driveRobotOriented(ChassisSpeeds velocity){
+    swerveDrive.drive(velocity);
+  }
+
+  public Command driveRobotOriented(Supplier<ChassisSpeeds> velocity){
+    return run(() -> {
+      swerveDrive.drive(velocity.get());
+    });
+  }
+
   /**
    * Drive according to the chassis robot oriented velocity.
    *

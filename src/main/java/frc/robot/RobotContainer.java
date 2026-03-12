@@ -29,6 +29,11 @@ import frc.robot.subsystems.mechanisms.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.AutoAimingSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import java.io.File;
 import java.util.Optional;
 
@@ -85,11 +90,16 @@ public class RobotContainer {
          * The container for the robot. Contains subsystems, OI devices, and commands.
          */
         public RobotContainer() {
+                NamedCommands.registerCommand("DeployIntake", intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
+                NamedCommands.registerCommand("RetractIntake", intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
+                NamedCommands.registerCommand("RunIntakeRollers", intake.in());
+                NamedCommands.registerCommand("StopIntakeRollers", intake.stop());
+                NamedCommands.registerCommand("ExtendClimber", climber.moveToPosition(Constants.climber.extendedPosition));
+                NamedCommands.registerCommand("RetractClimber", climber.moveToPosition(Constants.climber.retractedPosition));
+                //TODO: add shooter commands
+
                 // Configure the trigger bindings
                 configureBindings();
-                DriverStation.silenceJoystickConnectionWarning(true);
-                // TODO: uncomment this when using on the real robot
-                // questNavSubsystem.resetTrackingToPoseFromLimelight();
 
                 // Set the default auto (do nothing)
                 autoChooser.setDefaultOption("Do Nothing", Commands.runOnce(drivebase::zeroGyroWithAlliance)
@@ -105,22 +115,13 @@ public class RobotContainer {
                 if (autoChooser.getSelected() == null) {
                         RobotModeTriggers.autonomous().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
                 }
-                //drivebase.getSwerveDrive().setAutoCenteringModules(true);
         }
 
         private void configureBindings() {
-                Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity); // this
-                                                                                                                 // one
-                                                                                                                 // is
-                                                                                                                 // used
-                Command driveDirectAngleCommand = drivebase.driveFieldOriented(driveDirectAngle);
-                Command driveRobotRelativeCommand = Commands.run(()->drivebase.driveRobotRelative(driveRobotOriented.get()));
+                Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+                Command driveRobotOriented = drivebase.driveRobotOriented(driveDirectAngle);
 
                 drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-                // Deploy the intake with the X button and start intake roller
-                //driverXbox.x().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, true));
-                // Retract the intake with the Y button and stop intake roller
-                //driverXbox.y().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
 
                 // Aim at target continuously while allowing driver movement
                 //driverXbox.leftTrigger()
@@ -129,22 +130,14 @@ public class RobotContainer {
                 //                        autoAim.aimAtTarget();
                 //                }));
 
-                //driverXbox.a().onTrue(Commands.runOnce(() -> drivebase.resetPose(drivebase.getPose()))); // for sim,
-                                                                                                         // comment out
-                                                                                                         // when running
-                                                                                                         // on real
-                                                                                                         // robot
-
                 driverXbox.rightBumper().onTrue(drivebase.centerModulesCommand());
-                //driverXbox.y().onTrue(Commands.runOnce(()->drivebase.setDefaultCommand(driveDirectAngleCommand)));
-                //driverXbox.x().onTrue(Commands.runOnce(()->drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity)));
-
                 driverXbox.a().onTrue(Commands.runOnce(()->shooter.run()));
                 driverXbox.a().onFalse(Commands.runOnce(()->shooter.stop()));
                 driverXbox.b().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, true));
                 driverXbox.x().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
                 driverXbox.povUp().onTrue(climber.moveToPosition(Constants.climber.extendedPosition));
                 driverXbox.povDown().onTrue(climber.moveToPosition(Constants.climber.retractedPosition));
+                driverXbox.rightTrigger().whileTrue(driveRobotOriented);
         }
 
         /**
