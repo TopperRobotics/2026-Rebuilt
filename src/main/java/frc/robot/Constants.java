@@ -37,10 +37,11 @@ public final class Constants {
   public static final double MAX_SPEED = Units.feetToMeters(20);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
-  // the two limelights are named x and y because one is mounted on the
-  // x-axis and the other is mounted on the y-axis, two are needed to get an accurate global pose estimate
-  public static final String LIMELIGHT_X_IP_ADDRESS = "10.39.84.11"; 
-  public static final String LIMELIGHT_Y_IP_ADDRESS = "10.39.84.12";
+  public static final String LIMELIGHT_FRONT_IP_ADDRESS = "10.39.84.11"; 
+  public static final String LIMELIGHT_BACK_IP_ADDRESS = "10.39.84.12";
+  public static final String LIMELIGHT_FRONT_NAME = "evan";
+  public static final String LIMELIGHT_BACK_NAME = "burger";
+  // did he just say his last name is burger?
 
   // public static final class AutonConstants
   // {
@@ -95,15 +96,15 @@ public final class Constants {
     public static final double kV = 0.0; // Velocity feedforward
     public static final double kA = 0.0; // Acceleration feedforward
 
-    // Motion profile constraints
-    public static final double maxVelocity = 2.0; // degrees per second
-    public static final double maxAcceleration = 1.0; // degrees per second squared
+    // Motion profile constraints 
+    public static final double maxVelocity = 10.0; // degrees per second
+    public static final double maxAcceleration = 5.0; // degrees per second squared
 
     public static final double tolerance = 0.1; // Position tolerance in degrees
     public static final double velocityTolerance = 1.0; // Velocity tolerance in deg/sec
 
-    public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(0.0));
-    public static final Rotation2d deployedPosition = new Rotation2d(Math.toRadians(99.0));
+    public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(1));
+    public static final Rotation2d deployedPosition = new Rotation2d(Math.toRadians(95.0));
   }
 
   public static final class shooter {
@@ -114,9 +115,9 @@ public final class Constants {
     public static final double gearRatio = 3.0;
 
     // PID gains
-    public static final double kP = 0.005;
+    public static final double kP = 0.05;
     public static final double kI = 0.0;
-    public static final double kD = 0.0001;
+    public static final double kD = 0.001;
 
     // Feedforward gains
     public static final double kS = 0.0; // Static friction
@@ -128,7 +129,7 @@ public final class Constants {
     public static final double maxVelocity = 2.0; // degrees per second
     public static final double maxAcceleration = 1.0; // degrees per second squared
 
-    public static final double tolerance = 0.1; // Position tolerance in degrees
+    public static final double tolerance = 0.5; // Position tolerance in degrees
     public static final double velocityTolerance = 1.0; // Velocity tolerance in deg/sec
 
     public static final double forwardSoftLimit = 35; // degrees
@@ -149,11 +150,11 @@ public final class Constants {
 
   public static final class climber {
     public static final double gearRatio = 45.0;
-    public static final double kP = 0;
+    public static final double kP = 0.01;
     public static final double kI = 0;
     public static final double kD = 0;
     public static final double tolerance = 0;
-    public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(0));
-    public static final Rotation2d extendedPosition = new Rotation2d(Math.toRadians(0));
+    public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(-75));
+    public static final Rotation2d extendedPosition = new Rotation2d(Math.toRadians(1100));
   }
 }

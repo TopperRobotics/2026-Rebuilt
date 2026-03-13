@@ -30,12 +30,6 @@ public class ShooterSubsystem extends SubsystemBase {
         } else {
             shooterMotor.stopMotor();
         }
-        try{
-            wait(60);
-        } catch (Exception e){
-            System.out.println(e);
-        }
-        beltMotor.set(1);
     }
 
     public void stop() {
@@ -46,6 +40,12 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command shoot(){
         return runOnce(() -> {
             run();
+        }).withTimeout(0.2).andThen(runConveyor());
+    }
+
+    public Command runConveyor(){
+        return runOnce(()->{
+            beltMotor.set(1);
         });
     }
 

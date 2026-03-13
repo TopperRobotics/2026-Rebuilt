@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.climber;
 import frc.robot.subsystems.localization.PathfindingSubsystem;
+import frc.robot.subsystems.localization.VisionSubsystem;
 import frc.robot.subsystems.mechanisms.ClimberSubsystem;
 import frc.robot.subsystems.mechanisms.IntakeSubsystem;
 import frc.robot.subsystems.mechanisms.ShooterHoodSubsystem;
@@ -49,8 +50,8 @@ public class RobotContainer {
         private ClimberSubsystem climber = new ClimberSubsystem();
         private ShooterHoodSubsystem shooterHood = new ShooterHoodSubsystem(new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, drivebase);
         private AutoAimingSubsystem autoAim = new AutoAimingSubsystem(drivebase, new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, driverXbox);
-
-        private final SendableChooser<Command> autoChooser;
+        //private VisionSubsystem vision = new VisionSubsystem(drivebase, Constants.LIMELIGHT_FRONT_NAME, Constants.LIMELIGHT_BACK_NAME);
+        private SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -83,6 +84,7 @@ public class RobotContainer {
          * The container for the robot. Contains subsystems, OI devices, and commands.
          */
         public RobotContainer() {
+                NamedCommands.registerCommand("SetOdometryToLLPose", getAutonomousCommand());
                 NamedCommands.registerCommand("DeployIntake", intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
                 NamedCommands.registerCommand("RetractIntake", intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
                 NamedCommands.registerCommand("RunIntakeRollers", intake.in());
@@ -91,8 +93,6 @@ public class RobotContainer {
                 NamedCommands.registerCommand("RetractClimber", climber.moveToPosition(Constants.climber.retractedPosition));
                 NamedCommands.registerCommand("RunShooter", shooter.shoot());
                 NamedCommands.registerCommand("StopShooter", shooter.stopShooting());
-        
-                autoChooser = AutoBuilder.buildAutoChooser();
 
                 // Configure the trigger bindings
                 configureBindings();
@@ -125,13 +125,16 @@ public class RobotContainer {
                 driverXbox.rightBumper().onTrue(drivebase.centerModulesCommand());
                 driverXbox.a().onTrue(shooter.shoot());
                 driverXbox.a().onFalse(shooter.stopShooting());
-                driverXbox.b().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, true));
-                driverXbox.x().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
+                driverXbox.x().onTrue(Commands.run(() -> intake.toggleIntakeOutness()));
                 driverXbox.povUp().onTrue(climber.moveToPosition(Constants.climber.extendedPosition));
                 driverXbox.povDown().onTrue(climber.moveToPosition(Constants.climber.retractedPosition));
                 driverXbox.rightTrigger().whileTrue(driveRobotOriented);
-                driverXbox.povLeft().whileTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(shooterHood.getHoodPosition() - 1))));
-                driverXbox.povRight().whileTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(shooterHood.getHoodPosition() + 1))));
+                driverXbox.povLeft().onTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(-20))));
+                driverXbox.povRight().onTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(0))));
+                driverXbox.y().onTrue(climber.runNegative());
+                driverXbox.y().onFalse(climber.stop());
+                driverXbox.leftBumper().onTrue(climber.runPositive());
+                driverXbox.leftBumper().onFalse(climber.stop());
         }
 
         /**

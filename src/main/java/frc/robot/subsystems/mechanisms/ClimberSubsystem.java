@@ -61,6 +61,18 @@ public class ClimberSubsystem extends SubsystemBase {
         climberMotorPID.setSetpoint(goal.getDegrees(), SparkBase.ControlType.kPosition);
     }
 
+    public Command runNegative(){
+        return runOnce(() -> {
+            climberMotor.set(-0.2);
+        });
+    }
+
+    public Command runPositive(){
+        return runOnce(() -> {
+            climberMotor.set(0.2);
+        });
+    }
+
     public Command moveToPosition(Rotation2d goal) {
         return runOnce(() -> {
             // Log goal position to SmartDashboard for debugging
@@ -75,5 +87,10 @@ public class ClimberSubsystem extends SubsystemBase {
                 // Timeout safety: stop after 1 second if position not reached
                 .withTimeout(1.0)
         );
+    }
+
+    @Override
+    public void periodic(){
+        SmartDashboard.putNumber("Climber/Climber Position", climberMotorEncoder.getPosition());
     }
 }

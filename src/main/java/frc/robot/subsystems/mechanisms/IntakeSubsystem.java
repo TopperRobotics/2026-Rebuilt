@@ -24,7 +24,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private RelativeEncoder intakeArmRightMotorEncoder;
     private SparkClosedLoopController intakeArmLeftMotorPID;
     private SparkClosedLoopController intakeArmRightMotorPID;
-    private SparkFlex intakeRollerMotor;
+    private SparkMax intakeRollerMotor;
 
     public IntakeSubsystem() {
         // Initialize intake arm motor
@@ -39,7 +39,7 @@ public class IntakeSubsystem extends SubsystemBase {
         );
         
         // Initialize intake roller motors
-        intakeRollerMotor = new SparkFlex(12, MotorType.kBrushless);
+        intakeRollerMotor = new SparkMax(12, MotorType.kBrushless);
 
         // Configure motor settings using SparkMaxConfig
         SparkMaxConfig config = new SparkMaxConfig();
@@ -187,6 +187,14 @@ public class IntakeSubsystem extends SubsystemBase {
             // After reaching position, optionally start intake
             startIntake ? in() : stop()
         );
+    }
+
+    public void toggleIntakeOutness(){
+        if(getPositionLeft().getDegrees() > Constants.intakeArm.retractedPosition.getDegrees()){
+            runOnce(() -> {moveToPosition(Constants.intakeArm.deployedPosition, false);});
+        } else {
+            runOnce(() -> {moveToPosition(Constants.intakeArm.retractedPosition, false);});
+        }
     }
     
     // PERIODIC METHOD

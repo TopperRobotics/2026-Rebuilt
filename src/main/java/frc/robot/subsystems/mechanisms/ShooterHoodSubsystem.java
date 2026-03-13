@@ -52,6 +52,8 @@ public class ShooterHoodSubsystem extends SubsystemBase {
         config.softLimit.forwardSoftLimit(Constants.shooterHood.forwardSoftLimit);
         config.softLimit.reverseSoftLimit(Constants.shooterHood.reverseSoftLimit);
 
+        config.smartCurrentLimit(60, 60);
+
         // Apply configuration to motor
         hoodMotor.configure(
                 config,
@@ -139,5 +141,7 @@ public class ShooterHoodSubsystem extends SubsystemBase {
         // putDistanceFromTargetOnNT();
         // retrieveNeededHoodAngleFromNT();
         SmartDashboard.putNumber("Shooter Hood/Current Position", hoodMotorEncoder.getPosition());
+        SmartDashboard.putNumber("Shooter Hood/Current", hoodMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Shooter Hood/Temperature", hoodMotor.getMotorTemperature());
     }
 }
