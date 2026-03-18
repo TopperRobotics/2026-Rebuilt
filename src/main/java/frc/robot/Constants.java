@@ -34,13 +34,13 @@ public final class Constants {
                                                                    // for fun
   public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED = Units.feetToMeters(20);
+  public static final double MAX_SPEED = Units.feetToMeters(5);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
   public static final String LIMELIGHT_FRONT_IP_ADDRESS = "10.39.84.11"; 
   public static final String LIMELIGHT_BACK_IP_ADDRESS = "10.39.84.12";
-  public static final String LIMELIGHT_FRONT_NAME = "evan";
-  public static final String LIMELIGHT_BACK_NAME = "burger";
+  public static final String LIMELIGHT_FRONT_NAME = "limelight-evan";
+  public static final String LIMELIGHT_BACK_NAME = "limelight-burger";
   // did he just say his last name is burger?
 
   // public static final class AutonConstants
@@ -115,9 +115,9 @@ public final class Constants {
     public static final double gearRatio = 3.0;
 
     // PID gains
-    public static final double kP = 0.05;
-    public static final double kI = 0.0;
-    public static final double kD = 0.001;
+    public static final double kP = 0.06;
+    public static final double kI = 0.001;
+    public static final double kD = 0.1;
 
     // Feedforward gains
     public static final double kS = 0.0; // Static friction
@@ -150,11 +150,11 @@ public final class Constants {
 
   public static final class climber {
     public static final double gearRatio = 45.0;
-    public static final double kP = 0.01;
+    public static final double kP = 0.03;
     public static final double kI = 0;
     public static final double kD = 0;
     public static final double tolerance = 0;
-    public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(-75));
-    public static final Rotation2d extendedPosition = new Rotation2d(Math.toRadians(1100));
+    public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(0.0));
+    public static final Rotation2d extendedPosition = new Rotation2d(Math.toRadians(1219.0152587890625));
   }
 }

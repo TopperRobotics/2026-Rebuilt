@@ -25,6 +25,10 @@ public class IntakeSubsystem extends SubsystemBase {
     private SparkClosedLoopController intakeArmLeftMotorPID;
     private SparkClosedLoopController intakeArmRightMotorPID;
     private SparkMax intakeRollerMotor;
+    private enum IntakeArmState {
+        IN, OUT
+    }
+    private IntakeArmState currentIntakeArmState = IntakeArmState.OUT;
 
     public IntakeSubsystem() {
         // Initialize intake arm motor
@@ -90,7 +94,7 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public Command out() {
          return run(() -> {
-            intakeRollerMotor.set(-0.4); 
+            intakeRollerMotor.set(1); 
          });
     }
     
@@ -99,7 +103,7 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public Command in() {
         return run(() -> {
-            intakeRollerMotor.set(0.4); 
+            intakeRollerMotor.set(-1); 
         });
     }
     
@@ -159,6 +163,11 @@ public class IntakeSubsystem extends SubsystemBase {
      * @param goal Target position in degrees
      */
     public void goToPosition(Rotation2d goal) {
+        if(goal == Constants.intakeArm.deployedPosition){
+            currentIntakeArmState = IntakeArmState.OUT;
+        } else if (goal == Constants.intakeArm.retractedPosition){
+            currentIntakeArmState = IntakeArmState.IN;
+        }
         intakeArmLeftMotorPID.setSetpoint(goal.getDegrees(), SparkBase.ControlType.kPosition);
         intakeArmRightMotorPID.setSetpoint(goal.getDegrees(), SparkBase.ControlType.kPosition);
     }
@@ -187,6 +196,18 @@ public class IntakeSubsystem extends SubsystemBase {
             // After reaching position, optionally start intake
             startIntake ? in() : stop()
         );
+    }
+
+    public Command toggleIntakeArmDeployment(){
+        return runOnce(() -> {
+            if(currentIntakeArmState == IntakeArmState.OUT){
+                goToPosition(Constants.intakeArm.retractedPosition);
+                currentIntakeArmState = IntakeArmState.IN;
+            } else {
+                goToPosition(Constants.intakeArm.deployedPosition);
+                currentIntakeArmState = IntakeArmState.OUT;
+            }
+        });
     }
 
     public void toggleIntakeOutness(){

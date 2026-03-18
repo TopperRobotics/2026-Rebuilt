@@ -63,13 +63,13 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public Command runNegative(){
         return runOnce(() -> {
-            climberMotor.set(-0.2);
+            climberMotor.set(-1);
         });
     }
 
     public Command runPositive(){
         return runOnce(() -> {
-            climberMotor.set(0.2);
+            climberMotor.set(1);
         });
     }
 
