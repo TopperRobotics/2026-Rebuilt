@@ -135,6 +135,12 @@ public class ShooterHoodSubsystem extends SubsystemBase {
         return this.hoodMotorEncoder.getPosition();
     }
 
+    public Command stopHood(){
+        return runOnce(() -> {
+            hoodMotor.stopMotor();
+        });
+    }
+
     @Override
     public void periodic() {
         // determineDistanceFromTarget();

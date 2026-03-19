@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -43,18 +44,17 @@ import swervelib.SwerveInputStream;
 
 public class RobotContainer {
 
-        final CommandXboxController driverXbox = new CommandXboxController(2);
+        final CommandXboxController driverXbox = new CommandXboxController(0);
+        final CommandXboxController secondDriverXbox = new CommandXboxController(1);
         private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                         "swerve/neo"));
         private IntakeSubsystem intake = new IntakeSubsystem();
         private ShooterSubsystem shooter = new ShooterSubsystem();
         private ClimberSubsystem climber = new ClimberSubsystem();
         private ShooterHoodSubsystem shooterHood = new ShooterHoodSubsystem(new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, drivebase);
-        private AutoAimingSubsystem autoAim = new AutoAimingSubsystem(drivebase, new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, driverXbox);
+        private AutoAimingSubsystem autoAim = new AutoAimingSubsystem(drivebase, new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, secondDriverXbox);
         private VisionSubsystem vision = new VisionSubsystem(drivebase, Constants.LIMELIGHT_FRONT_NAME, Constants.LIMELIGHT_BACK_NAME);
         private SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
-        //private UsbCamera camera0 = new UsbCamera("camera 0", 0);
-        //private MjpegServer mjpegServer0 = new MjpegServer("server camera 0", 1181);
 
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -87,12 +87,8 @@ public class RobotContainer {
          * The container for the robot. Contains subsystems, OI devices, and commands.
          */
         public RobotContainer() {
-                //mjpegServer0.setSource(camera0);
-                //CameraServer.startAutomaticCapture(camera0);
-                //CameraServer.addCamera(camera0);
-                //CameraServer.addServer("climber cam server", 1182);
-                //CameraServer.putVideo("climber cam", 640, 480);
                 CameraServer.startAutomaticCapture();
+
                 NamedCommands.registerCommand("SetOdometryToLLPose", getAutonomousCommand());
                 NamedCommands.registerCommand("DeployIntake", intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
                 NamedCommands.registerCommand("RetractIntake", intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
@@ -100,7 +96,8 @@ public class RobotContainer {
                 NamedCommands.registerCommand("StopIntakeRollers", intake.stop());
                 NamedCommands.registerCommand("ExtendClimber", climber.moveToPosition(Constants.climber.extendedPosition));
                 NamedCommands.registerCommand("RetractClimber", climber.moveToPosition(Constants.climber.retractedPosition));
-                NamedCommands.registerCommand("RunShooter", shooter.shoot());
+                NamedCommands.registerCommand("RunShooterFullPower", shooter.shoot(50.96));
+                NamedCommands.registerCommand("RunShooterHalfPower", shooter.shoot(50.96*0.5));
                 NamedCommands.registerCommand("StopShooter", shooter.stopShooting());
 
                 // Configure the trigger bindings
@@ -116,6 +113,8 @@ public class RobotContainer {
                 if (autoChooser.getSelected() == null) {
                         RobotModeTriggers.autonomous().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
                 }
+
+                shooterHood.setDefaultCommand(shooterHood.stopHood()); // remove this when hood auto adjust is finished
         }
 
         private void configureBindings() {
@@ -125,32 +124,19 @@ public class RobotContainer {
                 drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
                 // Aim at target continuously while allowing driver movement
-                 driverXbox.rightTrigger()
-                                 .whileTrue(Commands.run(() -> {
-                                         shooterHood.autoAdjustHood();
-                                         autoAim.aimAtTarget();
-                                 }));
-                ///driverXbox.rightBumper().onTrue(drivebase.centerModulesCommand());
-                ///driverXbox.x().onTrue(intake.toggleIntakeArmDeployment());
-                ///driverXbox.a().onTrue(shooter.shoot());
-                ///driverXbox.a().onFalse(shooter.stopShooting());
-                // driverXbox.povUp().onTrue(climber.moveToPosition(Constants.climber.extendedPosition));
-                // driverXbox.povDown().onTrue(climber.moveToPosition(Constants.climber.retractedPosition));
-                // driverXbox.rightTrigger().whileTrue(driveRobotOriented);
-                driverXbox.povLeft().onTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(-20)))); // REMOVE FOR COMP
-                driverXbox.povRight().onTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(0)))); // REMOVE FOR COMP
-                driverXbox.b().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
-                driverXbox.a().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
-                driverXbox.x().onTrue(intake.in());
-                driverXbox.x().onFalse(intake.stop());
-                driverXbox.povUp().onTrue(climber.moveToPosition(Constants.climber.extendedPosition));
-                driverXbox.povDown().onTrue(climber.moveToPosition(Constants.climber.retractedPosition));
-                driverXbox.y().onTrue(shooter.shoot());
-                driverXbox.y().onFalse(shooter.stopShooting());
-                driverXbox.rightBumper().onTrue(climber.runNegative());
-                driverXbox.rightBumper().onFalse(climber.stop());
-                driverXbox.leftBumper().onTrue(climber.runPositive());
-                driverXbox.leftBumper().onFalse(climber.stop());
+                // driverXbox.rightTrigger().whileTrue(Commands.run(() -> {shooterHood.autoAdjustHood(); autoAim.aimAtTarget();})); // uncomment when hood auto aim is finished
+
+
+                // secondDriverXbox.rightTrigger().whileTrue(driveRobotOriented); // yagsl's robot oriented driving is very buggy
+
+                secondDriverXbox.b().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
+                secondDriverXbox.a().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
+                secondDriverXbox.x().onTrue(intake.in());
+                secondDriverXbox.x().onFalse(intake.stop());
+                secondDriverXbox.povUp().onTrue(climber.moveToPosition(Constants.climber.extendedPosition));
+                secondDriverXbox.povDown().onTrue(climber.moveToPosition(Constants.climber.retractedPosition));
+                secondDriverXbox.y().onTrue(shooter.shoot(50.96).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(new WaitCommand(0.2)).andThen(shooter.runConveyor()));
+                secondDriverXbox.y().onFalse(shooter.stopShooting());
         }
 
         /**

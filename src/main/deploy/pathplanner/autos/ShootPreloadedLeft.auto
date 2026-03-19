@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootPreloadedBottomPathBlue"
+            "pathName": "ShootPreloadedTopPath"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "RunShooter"
+            "name": "RunShooterHalfPower"
           }
         },
         {
