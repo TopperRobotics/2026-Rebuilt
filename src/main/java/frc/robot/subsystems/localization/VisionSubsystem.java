@@ -37,7 +37,6 @@ public class VisionSubsystem extends SubsystemBase {
     private void updateRobotPose() {
         boolean doRejectUpdate = false;
         if (LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightFName) != null && (LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightFName).pose.getX() != 0.0 && LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightFName).pose.getY() != 0.0)) {
-            SmartDashboard.putBoolean("Vision/Pose Was Null", false);
             LimelightHelpers.PoseEstimate mt2LimelightF = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightFName);
             //LimelightHelpers.PoseEstimate mtLimelightF = LimelightHelpers.getBotPoseEstimate_wpiBlue(limeLightBName)
             if (Math.abs(
@@ -46,13 +45,19 @@ public class VisionSubsystem extends SubsystemBase {
                 doRejectUpdate = true;
             }
             if (!doRejectUpdate) { // update robot pose with measurements from both limelights
-                swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.6, .6, 9999999));
-                swerveDrivePoseEstimator.addVisionMeasurement(
+                // if(mt2LimelightF.tagCount == 1){
+                //     swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1, 1, 10));
+                // } else {
+                //     swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 0.5));
+                // }
+                if(mt2LimelightF.tagCount >= 2){
+                    swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 9999));
+                    swerveDrivePoseEstimator.addVisionMeasurement(
                         mt2LimelightF.pose,
                         mt2LimelightF.timestampSeconds);
+                }
             }
-        } else if (LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName) != null && (LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName).pose.getX() != 0.0 && LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName).pose.getY() != 0.0)) {
-            SmartDashboard.putBoolean("Vision/Pose Was Null", false);
+        } if (LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName) != null && (LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName).pose.getX() != 0.0 && LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName).pose.getY() != 0.0)) {
             LimelightHelpers.PoseEstimate mt2LimelightB = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName);
             if (Math.abs(
                     Math.toDegrees(swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond)) > 720)
@@ -60,21 +65,73 @@ public class VisionSubsystem extends SubsystemBase {
                 doRejectUpdate = true;
             }
             if (!doRejectUpdate) { // update robot pose with measurements from both limelights
-                swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.6, .6, 9999999));
-                swerveDrivePoseEstimator.addVisionMeasurement(
-                        mt2LimelightB.pose,
-                        mt2LimelightB.timestampSeconds);
+                // if(mt2LimelightB.tagCount == 1){
+                //     swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1, 1, 10));
+                // } else {
+                //     swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 0.5));
+                // }
+                if(mt2LimelightB.tagCount >= 2){
+                    swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 9999));
+                    swerveDrivePoseEstimator.addVisionMeasurement(
+                            mt2LimelightB.pose,
+                            mt2LimelightB.timestampSeconds);
+                }
             }
-        } else {
-            SmartDashboard.putBoolean("Vision/Pose Was Null", true);
+        }
+    }
+
+    public void initalPoseUpdate(){
+        boolean doRejectUpdate = false;
+        updateLimelightOrientation();
+        if (LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightFName) != null && (LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightFName).pose.getX() != 0.0 && LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightFName).pose.getY() != 0.0)) {
+            LimelightHelpers.PoseEstimate mt2LimelightF = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightFName);
+            //LimelightHelpers.PoseEstimate mtLimelightF = LimelightHelpers.getBotPoseEstimate_wpiBlue(limeLightBName)
+            if (Math.abs(
+                    Math.toDegrees(swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond)) > 720)
+            {
+                doRejectUpdate = true;
+            }
+            if (!doRejectUpdate) { // update robot pose with measurements from both limelights
+                // if(mt2LimelightF.tagCount == 1){
+                //     swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1, 1, 10));
+                // } else {
+                //     swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 0.5));
+                // }
+                if(mt2LimelightF.tagCount > 0){
+                    swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 99999));
+                    swerveDrivePoseEstimator.addVisionMeasurement(
+                        mt2LimelightF.pose,
+                        mt2LimelightF.timestampSeconds);
+                }
+            }
+        } if (LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName) != null && (LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName).pose.getX() != 0.0 && LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName).pose.getY() != 0.0)) {
+            LimelightHelpers.PoseEstimate mt2LimelightB = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightBName);
+            if (Math.abs(
+                    Math.toDegrees(swerveSubsystem.getSwerveDrive().getRobotVelocity().omegaRadiansPerSecond)) > 720)
+            {
+                doRejectUpdate = true;
+            }
+            if (!doRejectUpdate) { // update robot pose with measurements from both limelights
+                // if(mt2LimelightB.tagCount == 1){
+                //     swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1, 1, 10));
+                // } else {
+                //     swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 0.5));
+                // }
+                if(mt2LimelightB.tagCount >= 0){
+                    swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 99999));
+                    swerveDrivePoseEstimator.addVisionMeasurement(
+                            mt2LimelightB.pose,
+                            mt2LimelightB.timestampSeconds);
+                }
+            }
         }
     }
 
     @Override
     public void periodic() {
         // Update vision data periodically from both limelights
-        updateLimelightOrientation();
-        updateRobotPose();
+        //updateLimelightOrientation();
+        //updateRobotPose();
     }
 
 }

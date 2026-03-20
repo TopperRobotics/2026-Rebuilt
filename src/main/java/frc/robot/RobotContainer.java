@@ -50,7 +50,6 @@ public class RobotContainer {
                         "swerve/neo"));
         private IntakeSubsystem intake = new IntakeSubsystem();
         private ShooterSubsystem shooter = new ShooterSubsystem();
-        private ClimberSubsystem climber = new ClimberSubsystem();
         private ShooterHoodSubsystem shooterHood = new ShooterHoodSubsystem(new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, drivebase);
         private AutoAimingSubsystem autoAim = new AutoAimingSubsystem(drivebase, new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, secondDriverXbox);
         private VisionSubsystem vision = new VisionSubsystem(drivebase, Constants.LIMELIGHT_FRONT_NAME, Constants.LIMELIGHT_BACK_NAME);
@@ -61,11 +60,11 @@ public class RobotContainer {
          * by angular velocity.
          */
         SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                        () -> driverXbox.getLeftX(),
-                        () -> driverXbox.getLeftY() * -1)
+                        () -> driverXbox.getLeftY() * -1,
+                        () -> driverXbox.getLeftX() * -1)
                         .withControllerRotationAxis(driverXbox::getRightX)
                         .deadband(OperatorConstants.DEADBAND)
-                        .allianceRelativeControl(false);
+                        .allianceRelativeControl(true);
 
         /**
          * Clone's the angular velocity input stream and converts it to a fieldRelative
@@ -81,7 +80,7 @@ public class RobotContainer {
          * input stream.
          */
         SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
-                        .allianceRelativeControl(false);
+                        .allianceRelativeControl(true);
 
         /**
          * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -94,10 +93,8 @@ public class RobotContainer {
                 NamedCommands.registerCommand("RetractIntake", intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
                 NamedCommands.registerCommand("RunIntakeRollers", intake.in());
                 NamedCommands.registerCommand("StopIntakeRollers", intake.stop());
-                NamedCommands.registerCommand("ExtendClimber", climber.moveToPosition(Constants.climber.extendedPosition));
-                NamedCommands.registerCommand("RetractClimber", climber.moveToPosition(Constants.climber.retractedPosition));
-                NamedCommands.registerCommand("RunShooterFullPower", shooter.shoot(50.96));
-                NamedCommands.registerCommand("RunShooterHalfPower", shooter.shoot(50.96*0.5));
+                NamedCommands.registerCommand("RunShooterFullPower", shooter.shoot(-1).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
+                NamedCommands.registerCommand("RunShooterHalfPower", shooter.shoot(-1).andThen(new WaitCommand(0.3)).andThen(shooter.shoot(-0.6)).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
                 NamedCommands.registerCommand("StopShooter", shooter.stopShooting());
 
                 // Configure the trigger bindings
@@ -133,9 +130,7 @@ public class RobotContainer {
                 secondDriverXbox.a().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
                 secondDriverXbox.x().onTrue(intake.in());
                 secondDriverXbox.x().onFalse(intake.stop());
-                secondDriverXbox.povUp().onTrue(climber.moveToPosition(Constants.climber.extendedPosition));
-                secondDriverXbox.povDown().onTrue(climber.moveToPosition(Constants.climber.retractedPosition));
-                secondDriverXbox.y().onTrue(shooter.shoot(50.96).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(new WaitCommand(0.2)).andThen(shooter.runConveyor()));
+                secondDriverXbox.y().onTrue(shooter.shoot(-1).andThen(new WaitCommand(0.3)).andThen(shooter.shoot(-0.6)).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
                 secondDriverXbox.y().onFalse(shooter.stopShooting());
         }
 
@@ -147,6 +142,7 @@ public class RobotContainer {
         public Command getAutonomousCommand() {
                 // Pass in the selected auto from the SmartDashboard as our desired autnomous
                 // commmand
+                vision.initalPoseUpdate();
                 return autoChooser.getSelected();
         }
 

@@ -21,6 +21,7 @@ public class ShooterHoodSubsystem extends SubsystemBase {
 
     private double distanceFromTarget = 0.000;
     private double neededHoodAngle = Constants.shooterHood.reverseSoftLimit;
+    private double launchSpeed = 50.96;
 
     private Translation2d hopperPosition = new Translation2d();
     private SwerveSubsystem swerveSubsystem;
@@ -66,6 +67,8 @@ public class ShooterHoodSubsystem extends SubsystemBase {
 
         // Reset encoder position to zero
         hoodMotorEncoder.setPosition(0);
+
+        //SmartDashboard.putNumber("Shooter Hood/Distance From Target", 0.0);
     }
 
     public void setHoodPosition(double positionDegrees) {
@@ -121,13 +124,26 @@ public class ShooterHoodSubsystem extends SubsystemBase {
                 .sqrt(Math.pow(hopperPositionX - robotPoseX, 2) + Math.pow(hopperPositionY - robotPoseY, 2));
     }
 
+    public void determineHoodAngle(){
+        double hoodAngle = 0.5*Math.pow(Math.sin((9.8*distanceFromTarget)/(Math.pow(launchSpeed, 2))), -1);
+        this.neededHoodAngle = hoodAngle;
+    }
+
     public void autoAdjustHood(){
-        //
+        //determineDistanceFromTarget();
+        determineHoodAngle();
+        moveToPosition(-neededHoodAngle);
     }
 
     public Command moveToPosition(Rotation2d goal) {
         return runOnce(() -> {
             setHoodPosition(goal.getDegrees());
+        });
+    }
+
+    public Command moveToPosition(double goalDegrees) {
+        return runOnce(() -> {
+            setHoodPosition(goalDegrees);
         });
     }
 
@@ -143,9 +159,9 @@ public class ShooterHoodSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // determineDistanceFromTarget();
-        // putDistanceFromTargetOnNT();
-        // retrieveNeededHoodAngleFromNT();
+        this.distanceFromTarget = SmartDashboard.getNumber("Shooter Hood/Distance From Target", distanceFromTarget);
+        autoAdjustHood();
+        SmartDashboard.putNumber("Shooter Hood/Needed Angle", neededHoodAngle);
         SmartDashboard.putNumber("Shooter Hood/Current Position", hoodMotorEncoder.getPosition());
         SmartDashboard.putNumber("Shooter Hood/Current", hoodMotor.getOutputCurrent());
         SmartDashboard.putNumber("Shooter Hood/Temperature", hoodMotor.getMotorTemperature());

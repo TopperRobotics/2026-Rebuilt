@@ -34,7 +34,7 @@ public final class Constants {
                                                                    // for fun
   public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED = Units.feetToMeters(5);
+  public static final double MAX_SPEED = Units.feetToMeters(20);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
   public static final String LIMELIGHT_FRONT_IP_ADDRESS = "10.39.84.11"; 
@@ -132,8 +132,8 @@ public final class Constants {
     public static final double tolerance = 0.5; // Position tolerance in degrees
     public static final double velocityTolerance = 1.0; // Velocity tolerance in deg/sec
 
-    public static final double forwardSoftLimit = 35; // degrees
-    public static final double reverseSoftLimit = 0;
+    public static final double forwardSoftLimit = 0; // degrees
+    public static final double reverseSoftLimit = -20;
   }
 
   public static final class FieldConstants {

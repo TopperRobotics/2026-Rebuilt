@@ -50,14 +50,24 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command shoot(double desiredSpeed){
         this.desiredFlywheelSpeed = desiredSpeed;
         return runOnce(() -> {
-            run();
+            //run();
+            shooterMotor.set(desiredSpeed);
+        });
+    }
+
+    public Command runEntireShooterReverse(){
+        return runOnce(() -> {
+            shooterMotor.set(-0.4);
+            beltMotor.set(-0.4);
+            feederMotor.set(0.4);
         });
     }
 
     public Command shoot(){
         this.desiredFlywheelSpeed = 50.96;
         return runOnce(() -> {
-            run();
+            //run();
+            shooterMotor.set(1);
         });
     }
 
