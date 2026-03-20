@@ -45,13 +45,12 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
 
         final CommandXboxController driverXbox = new CommandXboxController(0);
-        final CommandXboxController secondDriverXbox = new CommandXboxController(1);
         private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                         "swerve/neo"));
-        private IntakeSubsystem intake = new IntakeSubsystem();
-        private ShooterSubsystem shooter = new ShooterSubsystem();
+        private IntakeSubsystem intake;
+        private ShooterSubsystem shooter;
         private ShooterHoodSubsystem shooterHood = new ShooterHoodSubsystem(new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, drivebase);
-        private AutoAimingSubsystem autoAim = new AutoAimingSubsystem(drivebase, new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, secondDriverXbox);
+        private AutoAimingSubsystem autoAim = new AutoAimingSubsystem(drivebase, new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, driverXbox);
         private VisionSubsystem vision = new VisionSubsystem(drivebase, Constants.LIMELIGHT_FRONT_NAME, Constants.LIMELIGHT_BACK_NAME);
         private SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -86,6 +85,9 @@ public class RobotContainer {
          * The container for the robot. Contains subsystems, OI devices, and commands.
          */
         public RobotContainer() {
+                intake = new IntakeSubsystem();
+                shooter = new ShooterSubsystem();
+
                 CameraServer.startAutomaticCapture();
 
                 NamedCommands.registerCommand("SetOdometryToLLPose", getAutonomousCommand());
@@ -94,7 +96,7 @@ public class RobotContainer {
                 NamedCommands.registerCommand("RunIntakeRollers", intake.in());
                 NamedCommands.registerCommand("StopIntakeRollers", intake.stop());
                 NamedCommands.registerCommand("RunShooterFullPower", shooter.shoot(-1).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
-                NamedCommands.registerCommand("RunShooterHalfPower", shooter.shoot(-1).andThen(new WaitCommand(0.3)).andThen(shooter.shoot(-0.6)).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
+                NamedCommands.registerCommand("RunShooterHalfPower", shooter.shoot(-1).andThen(new WaitCommand(0.3)).andThen(shooter.shoot(-0.4)).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
                 NamedCommands.registerCommand("StopShooter", shooter.stopShooting());
 
                 // Configure the trigger bindings
@@ -126,12 +128,14 @@ public class RobotContainer {
 
                 // secondDriverXbox.rightTrigger().whileTrue(driveRobotOriented); // yagsl's robot oriented driving is very buggy
 
-                secondDriverXbox.b().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
-                secondDriverXbox.a().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
-                secondDriverXbox.x().onTrue(intake.in());
-                secondDriverXbox.x().onFalse(intake.stop());
-                secondDriverXbox.y().onTrue(shooter.shoot(-1).andThen(new WaitCommand(0.3)).andThen(shooter.shoot(-0.6)).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
-                secondDriverXbox.y().onFalse(shooter.stopShooting());
+                driverXbox.b().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
+                driverXbox.a().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
+                driverXbox.rightBumper().onTrue(intake.in());
+                driverXbox.rightBumper().onFalse(intake.stop());
+                driverXbox.rightTrigger().onTrue(shooter.shoot(-1).andThen(new WaitCommand(0.3)).andThen(shooter.shoot(-0.6)).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
+                driverXbox.rightTrigger().onFalse(shooter.stopShooting());
+                driverXbox.y().onTrue(shooter.runConveyorReverse());
+                driverXbox.y().onFalse(shooter.stopConveyor());
         }
 
         /**

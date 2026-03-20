@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class ShooterSubsystem extends SubsystemBase {
 
@@ -55,6 +56,10 @@ public class ShooterSubsystem extends SubsystemBase {
         });
     }
 
+    public Command shootAutoFullPower(){
+        return shoot(-1).andThen(new WaitCommand(0.4)).andThen(runFeeder()).andThen(runConveyor());
+    }
+
     public Command runEntireShooterReverse(){
         return runOnce(() -> {
             shooterMotor.set(-0.4);
@@ -80,6 +85,18 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command runConveyor(){
         return runOnce(()->{
             beltMotor.set(-1);
+        });
+    }
+
+    public Command runConveyorReverse(){
+        return runOnce(()->{
+            beltMotor.set(1);
+        });
+    }
+
+    public Command stopConveyor(){
+        return runOnce(() -> {
+            beltMotor.stopMotor();
         });
     }
 
