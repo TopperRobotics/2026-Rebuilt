@@ -20,7 +20,7 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 public class ShooterHoodSubsystem extends SubsystemBase {
 
     private double distanceFromTarget = 0.000;
-    private double neededHoodAngle = Constants.shooterHood.reverseSoftLimit;
+    private double neededHoodAngle = -20;
     private double launchSpeed = 50.96;
 
     private Translation2d hopperPosition = new Translation2d();
@@ -50,10 +50,7 @@ public class ShooterHoodSubsystem extends SubsystemBase {
         config.closedLoop
                 .pid(Constants.shooterHood.kP, Constants.shooterHood.kI, Constants.shooterHood.kD);
 
-        config.softLimit.forwardSoftLimit(Constants.shooterHood.forwardSoftLimit);
-        config.softLimit.reverseSoftLimit(Constants.shooterHood.reverseSoftLimit);
-
-        config.smartCurrentLimit(60, 60);
+        config.smartCurrentLimit(35, 35);
 
         // Apply configuration to motor
         hoodMotor.configure(
@@ -80,11 +77,11 @@ public class ShooterHoodSubsystem extends SubsystemBase {
     }
 
     public void retrieveNeededHoodAngleFromNT() {
-        double neededAngle = SmartDashboard.getNumber("Hood/Needed Angle", Constants.shooterHood.reverseSoftLimit);
+        double neededAngle = SmartDashboard.getNumber("Hood/Needed Angle", -20);
         if(neededAngle != -1){ // -1 means that at the robot's current distance from the target, no angle could be calculated to get the ball in the target
             this.neededHoodAngle = neededAngle;
         } else {
-            this.neededHoodAngle = Constants.shooterHood.reverseSoftLimit;
+            this.neededHoodAngle = 0;
         }
     }
 
@@ -159,8 +156,8 @@ public class ShooterHoodSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        this.distanceFromTarget = SmartDashboard.getNumber("Shooter Hood/Distance From Target", distanceFromTarget);
-        autoAdjustHood();
+        //this.distanceFromTarget = SmartDashboard.getNumber("Shooter Hood/Distance From Target", distanceFromTarget);
+        //autoAdjustHood();
         SmartDashboard.putNumber("Shooter Hood/Needed Angle", neededHoodAngle);
         SmartDashboard.putNumber("Shooter Hood/Current Position", hoodMotorEncoder.getPosition());
         SmartDashboard.putNumber("Shooter Hood/Current", hoodMotor.getOutputCurrent());

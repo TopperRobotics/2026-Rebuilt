@@ -1,0 +1,91 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MiddleShootPreloadAndIntakeFromCenterAndShootPart1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunShooterDistanceBased"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MiddleShootPreloadAndIntakeFromCenterAndShootPart2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DeployIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunIntakeRollers"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MiddleShootPreloadAndIntakeFromCenterAndShootPart3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntakeRollers"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RetractIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MiddleShootPreloadAndIntakeFromCenterAndShootPart4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MiddleShootPreloadAndIntakeFromCenterAndShootPart5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunShooterDistanceBased"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooter"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

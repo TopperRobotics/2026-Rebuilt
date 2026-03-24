@@ -115,9 +115,9 @@ public final class Constants {
     public static final double gearRatio = 3.0;
 
     // PID gains
-    public static final double kP = 0.06;
+    public static final double kP = 0.6;
     public static final double kI = 0.001;
-    public static final double kD = 0.1;
+    public static final double kD = 0.01;
 
     // Feedforward gains
     public static final double kS = 0.0; // Static friction
@@ -126,14 +126,11 @@ public final class Constants {
     public static final double kA = 0.0; // Acceleration feedforward
 
     // Motion profile constraints
-    public static final double maxVelocity = 2.0; // degrees per second
-    public static final double maxAcceleration = 1.0; // degrees per second squared
+    public static final double maxVelocity = 20.0; // degrees per second
+    public static final double maxAcceleration = 20.0; // degrees per second squared
 
     public static final double tolerance = 0.5; // Position tolerance in degrees
-    public static final double velocityTolerance = 1.0; // Velocity tolerance in deg/sec
-
-    public static final double forwardSoftLimit = 0; // degrees
-    public static final double reverseSoftLimit = -20;
+    public static final double velocityTolerance = 2.0; // Velocity tolerance in deg/sec
   }
 
   public static final class FieldConstants {

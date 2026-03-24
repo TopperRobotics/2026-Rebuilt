@@ -45,6 +45,7 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
 
         final CommandXboxController driverXbox = new CommandXboxController(0);
+        final CommandXboxController secondDriverXbox = new CommandXboxController(1);
         private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                         "swerve/neo"));
         private IntakeSubsystem intake;
@@ -128,14 +129,17 @@ public class RobotContainer {
 
                 // secondDriverXbox.rightTrigger().whileTrue(driveRobotOriented); // yagsl's robot oriented driving is very buggy
 
-                driverXbox.b().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
-                driverXbox.a().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
-                driverXbox.rightBumper().onTrue(intake.in());
-                driverXbox.rightBumper().onFalse(intake.stop());
                 driverXbox.rightTrigger().onTrue(shooter.shoot(-1).andThen(new WaitCommand(0.3)).andThen(shooter.shoot(-0.6)).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
                 driverXbox.rightTrigger().onFalse(shooter.stopShooting());
-                driverXbox.y().onTrue(shooter.runConveyorReverse());
-                driverXbox.y().onFalse(shooter.stopConveyor());
+                driverXbox.b().onTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(-30))));
+                driverXbox.x().onTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(0))));
+
+                secondDriverXbox.y().onTrue(shooter.runConveyorReverse());
+                secondDriverXbox.y().onFalse(shooter.stopConveyor());
+                secondDriverXbox.x().onTrue(intake.in());
+                secondDriverXbox.x().onFalse(intake.stop());
+                secondDriverXbox.povUp().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
+                secondDriverXbox.povDown().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
         }
 
         /**
