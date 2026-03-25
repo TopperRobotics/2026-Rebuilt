@@ -23,6 +23,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "StopShooter"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "MiddleShootPreloadAndIntakePart2"
@@ -50,6 +56,12 @@
           "type": "path",
           "data": {
             "pathName": "MiddleShootPreloadAndIntakePart3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.6
           }
         },
         {

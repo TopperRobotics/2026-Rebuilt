@@ -84,7 +84,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public Command runConveyor(){
         return runOnce(()->{
-            beltMotor.set(-1);
+            beltMotor.set(-0.8);
+        });
+    }
+
+    public Command runConveyor(double speed){
+        return runOnce(() -> {
+            beltMotor.set(speed);
         });
     }
 

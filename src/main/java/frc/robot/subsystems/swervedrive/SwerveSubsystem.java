@@ -16,11 +16,13 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -612,6 +614,18 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // 3. Return a new Pose2d at the same spot, but with the new rotation
     return new Pose2d(robotPose.getTranslation(), targetRotation);
+  }
+
+  public Command jostleDriveBase(){
+    return runOnce(() -> {
+      drive(new Translation2d(0, 0), Math.toRadians(20), true);
+    })
+    .andThen(new WaitCommand(0.4))
+    .andThen(
+      runOnce(() -> {
+        drive(new Translation2d(0, 0), Math.toRadians(-20), true);
+      })
+    );
   }
 
 }

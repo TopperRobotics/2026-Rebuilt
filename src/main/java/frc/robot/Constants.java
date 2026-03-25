@@ -97,14 +97,15 @@ public final class Constants {
     public static final double kA = 0.0; // Acceleration feedforward
 
     // Motion profile constraints 
-    public static final double maxVelocity = 10.0; // degrees per second
-    public static final double maxAcceleration = 5.0; // degrees per second squared
+    public static final double maxVelocity = 20.0; // degrees per second
+    public static final double maxAcceleration = 20.0; // degrees per second squared
 
     public static final double tolerance = 0.1; // Position tolerance in degrees
     public static final double velocityTolerance = 1.0; // Velocity tolerance in deg/sec
 
     public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(1));
-    public static final Rotation2d deployedPosition = new Rotation2d(Math.toRadians(95.0));
+    public static final Rotation2d deployedPosition = new Rotation2d(Math.toRadians(90.0));
+    public static final Rotation2d halfDeployedPosition = new Rotation2d(Math.toRadians(45));
   }
 
   public static final class shooter {
@@ -115,7 +116,7 @@ public final class Constants {
     public static final double gearRatio = 3.0;
 
     // PID gains
-    public static final double kP = 0.6;
+    public static final double kP = 6;
     public static final double kI = 0.001;
     public static final double kD = 0.01;
 

@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.shooterHood;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 public class ShooterHoodSubsystem extends SubsystemBase {
@@ -50,7 +51,7 @@ public class ShooterHoodSubsystem extends SubsystemBase {
         config.closedLoop
                 .pid(Constants.shooterHood.kP, Constants.shooterHood.kI, Constants.shooterHood.kD);
 
-        config.smartCurrentLimit(35, 35);
+        config.smartCurrentLimit(40, 40);
 
         // Apply configuration to motor
         hoodMotor.configure(

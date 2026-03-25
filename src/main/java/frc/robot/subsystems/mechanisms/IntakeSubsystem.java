@@ -103,7 +103,7 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public Command in() {
         return run(() -> {
-            intakeRollerMotor.set(-1); 
+            intakeRollerMotor.set(-0.75); 
         });
     }
     
@@ -182,6 +182,7 @@ public class IntakeSubsystem extends SubsystemBase {
         return runOnce(() -> {
             // Log goal position to SmartDashboard for debugging
             SmartDashboard.putNumber("Intake/Goal Position", goal.getDegrees());
+            //goToPosition(goal); // REMOVE THIS IS FOR DEBUGGING ONLY
         })
         .andThen(
             // Run PID controller until position is reached

@@ -53,7 +53,7 @@ public class RobotContainer {
         private ShooterHoodSubsystem shooterHood = new ShooterHoodSubsystem(new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, drivebase);
         private AutoAimingSubsystem autoAim = new AutoAimingSubsystem(drivebase, new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, driverXbox);
         private VisionSubsystem vision = new VisionSubsystem(drivebase, Constants.LIMELIGHT_FRONT_NAME, Constants.LIMELIGHT_BACK_NAME);
-        private SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
+        private SendableChooser<Command> autoChooser;
 
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -62,7 +62,7 @@ public class RobotContainer {
         SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
                         () -> driverXbox.getLeftY() * -1,
                         () -> driverXbox.getLeftX() * -1)
-                        .withControllerRotationAxis(driverXbox::getRightX)
+                        .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
                         .deadband(OperatorConstants.DEADBAND)
                         .allianceRelativeControl(true);
 
@@ -90,15 +90,16 @@ public class RobotContainer {
                 shooter = new ShooterSubsystem();
 
                 CameraServer.startAutomaticCapture();
-
-                NamedCommands.registerCommand("SetOdometryToLLPose", getAutonomousCommand());
                 NamedCommands.registerCommand("DeployIntake", intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
                 NamedCommands.registerCommand("RetractIntake", intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
                 NamedCommands.registerCommand("RunIntakeRollers", intake.in());
                 NamedCommands.registerCommand("StopIntakeRollers", intake.stop());
                 NamedCommands.registerCommand("RunShooterFullPower", shooter.shoot(-1).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
                 NamedCommands.registerCommand("RunShooterHalfPower", shooter.shoot(-1).andThen(new WaitCommand(0.3)).andThen(shooter.shoot(-0.4)).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
+                NamedCommands.registerCommand("RunShooterDistanceBased", shooter.shoot(-0.3).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor())); // run full power for now
                 NamedCommands.registerCommand("StopShooter", shooter.stopShooting());
+
+                this.autoChooser = AutoBuilder.buildAutoChooser();
 
                 // Configure the trigger bindings
                 configureBindings();
@@ -129,17 +130,22 @@ public class RobotContainer {
 
                 // secondDriverXbox.rightTrigger().whileTrue(driveRobotOriented); // yagsl's robot oriented driving is very buggy
 
-                driverXbox.rightTrigger().onTrue(shooter.shoot(-1).andThen(new WaitCommand(0.3)).andThen(shooter.shoot(-0.6)).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
+                driverXbox.rightTrigger().whileTrue(shooter.shoot(-0.6).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
                 driverXbox.rightTrigger().onFalse(shooter.stopShooting());
-                driverXbox.b().onTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(-30))));
-                driverXbox.x().onTrue(shooterHood.moveToPosition(new Rotation2d(Math.toRadians(0))));
 
+                driverXbox.a().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
+                driverXbox.y().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
+                driverXbox.leftTrigger().onTrue(intake.in());
+                driverXbox.leftTrigger().onFalse(intake.stop());
+
+                secondDriverXbox.rightBumper().onTrue(drivebase.centerModulesCommand());
                 secondDriverXbox.y().onTrue(shooter.runConveyorReverse());
                 secondDriverXbox.y().onFalse(shooter.stopConveyor());
                 secondDriverXbox.x().onTrue(intake.in());
                 secondDriverXbox.x().onFalse(intake.stop());
                 secondDriverXbox.povUp().onTrue(intake.moveToPosition(Constants.intakeArm.retractedPosition, false));
                 secondDriverXbox.povDown().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
+                secondDriverXbox.povLeft().onTrue(intake.moveToPosition(Constants.intakeArm.halfDeployedPosition, false));
         }
 
         /**
@@ -151,7 +157,7 @@ public class RobotContainer {
                 // Pass in the selected auto from the SmartDashboard as our desired autnomous
                 // commmand
                 vision.initalPoseUpdate();
-                return autoChooser.getSelected();
+                return this.autoChooser.getSelected();
         }
 
         public void setMotorBrake(boolean brake) {
