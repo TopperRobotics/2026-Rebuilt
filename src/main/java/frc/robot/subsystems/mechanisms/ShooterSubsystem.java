@@ -13,13 +13,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveDrive;
 
 public class ShooterSubsystem extends SubsystemBase {
 
     private final double gravity = 9.81;
-    private final double hoodAngle = Math.toRadians(10.0);
+    private final double hoodAngle = Math.toRadians(75);
     private final double robotHopperHeightDifference = 1.777998984; // Meters (Target Height - Shooter Height)
     private final double flywheelRadius = 0.0762; // 3 inches in meters
     
@@ -31,6 +32,7 @@ public class ShooterSubsystem extends SubsystemBase {
     
     SparkFlex shooterMotor = new SparkFlex(16, MotorType.kBrushless);
     RelativeEncoder shooterMotorEncoder = shooterMotor.getEncoder();
+    SparkClosedLoopController shooterPID;
     SparkMax beltMotor = new SparkMax(14, MotorType.kBrushless);
     SparkMax feederMotor = new SparkMax(15, MotorType.kBrushless);
 
@@ -40,15 +42,26 @@ public class ShooterSubsystem extends SubsystemBase {
         
         SparkMaxConfig config = new SparkMaxConfig();
         config.idleMode(IdleMode.kCoast);
+
+        // Configure encoder settings
+        config.encoder
+            .positionConversionFactor(360.0 / 1)
+            .velocityConversionFactor((360.0 / 1) / 60.0);
+        
+        // Configure PID controller settings
+        config.closedLoop
+            .pid(0.01, 0, 0);
+
         shooterMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
         feederMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
         beltMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
         
-        this.desiredFlywheelSpeed = 50.96; 
+
+        desiredFlywheelSpeed = 50.96; 
     }
 
     public void run() { // bang bang
-        if (shooterMotorEncoder.getVelocity() < desiredFlywheelSpeed) {
+        if (shooterMotorEncoder.getVelocity() > desiredFlywheelSpeed) {
             shooterMotor.set(-1); // motor is inverted
         } else {
             shooterMotor.stopMotor();
@@ -62,8 +75,8 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public Command shoot(double desiredSpeed){
-        this.desiredFlywheelSpeed = desiredSpeed;
-        return runOnce(() -> {
+        desiredFlywheelSpeed = desiredSpeed;
+        return run(() -> {
             run();
         });
     }
@@ -165,15 +178,17 @@ public class ShooterSubsystem extends SubsystemBase {
         double denominator = 2 * Math.pow(Math.cos(theta), 2) * (d * Math.tan(theta) - h);
 
         if (denominator <= 0) {
+            SmartDashboard.putBoolean("Flywheel Calulation Possible", false);
             // Robot is either too close or the math is impossible for this angle
             return;
         }
+        SmartDashboard.putBoolean("Flywheel Calulation Possible", true);
 
         double vBall = Math.sqrt(numerator / denominator);
 
         // Convert vBall (m/s) to RPM using your provided formula:
         // RPM = (vBall * 2 * 60) / (2 * PI * radius)
-        this.desiredFlywheelSpeed = (vBall * 120.0) / (2 * Math.PI * flywheelRadius);
+        desiredFlywheelSpeed = -((vBall * 120.0) / (2 * Math.PI * flywheelRadius));
     }
 
     @Override
@@ -184,6 +199,7 @@ public class ShooterSubsystem extends SubsystemBase {
         // Optional: Send data to SmartDashboard to debug
         SmartDashboard.putNumber("Distance to Target", distanceFromTarget);
         SmartDashboard.putNumber("Desired RPM", desiredFlywheelSpeed);
+        SmartDashboard.putNumber("Actual Flywheel Velocity", shooterMotorEncoder.getVelocity());
     }
 
 }

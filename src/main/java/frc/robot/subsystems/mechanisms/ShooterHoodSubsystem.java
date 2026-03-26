@@ -38,31 +38,31 @@ public class ShooterHoodSubsystem extends SubsystemBase {
         hoodMotor = new SparkMax(7, MotorType.kBrushless);
 
         // Configure motor settings using SparkMaxConfig
-        SparkMaxConfig config = new SparkMaxConfig();
-        config
-                .idleMode(IdleMode.kBrake);
+        // SparkMaxConfig config = new SparkMaxConfig();
+        // config
+        //         .idleMode(IdleMode.kBrake);
 
-        // Configure encoder settings
-        config.encoder
-                .positionConversionFactor(360.0 / Constants.shooterHood.gearRatio)
-                .velocityConversionFactor((360.0 / Constants.shooterHood.gearRatio) / 60.0);
+        // // Configure encoder settings
+        // config.encoder
+        //         .positionConversionFactor(360.0 / Constants.shooterHood.gearRatio)
+        //         .velocityConversionFactor((360.0 / Constants.shooterHood.gearRatio) / 60.0);
 
-        // Configure PID controller settings
-        config.closedLoop
-                .pid(Constants.shooterHood.kP, Constants.shooterHood.kI, Constants.shooterHood.kD);
+        // // Configure PID controller settings
+        // config.closedLoop
+        //         .pid(Constants.shooterHood.kP, Constants.shooterHood.kI, Constants.shooterHood.kD);
 
-        config.smartCurrentLimit(40, 40);
+        // config.smartCurrentLimit(40, 40);
 
-        config.closedLoopRampRate(0.5);
+        // config.closedLoopRampRate(0.5);
 
-        config.softLimit.forwardSoftLimit(0);
-        config.softLimit.reverseSoftLimit(-35);
+        // config.softLimit.forwardSoftLimit(0);
+        // config.softLimit.reverseSoftLimit(-35);
 
-        // Apply configuration to motor
-        hoodMotor.configure(
-                config,
-                SparkMax.ResetMode.kResetSafeParameters,
-                SparkMax.PersistMode.kPersistParameters);
+        // // Apply configuration to motor
+        // hoodMotor.configure(
+        //         config,
+        //         SparkMax.ResetMode.kResetSafeParameters,
+        //         SparkMax.PersistMode.kPersistParameters);
 
         // Get encoder and PID references after configuration
         hoodMotorEncoder = hoodMotor.getEncoder();

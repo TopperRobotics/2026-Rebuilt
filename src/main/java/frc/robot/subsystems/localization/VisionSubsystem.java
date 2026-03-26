@@ -130,8 +130,8 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // Update vision data periodically from both limelights
-        updateLimelightOrientation();
-        updateRobotPose();
+        //updateLimelightOrientation();
+        //updateRobotPose();
     }
 
 }

@@ -116,9 +116,9 @@ public final class Constants {
     public static final double gearRatio = 3.0;
 
     // PID gains
-    public static final double kP = 6;
-    public static final double kI = 0.001;
-    public static final double kD = 0.01;
+    public static final double kP = 0.03500000014901161;
+    public static final double kI = 0.000;
+    public static final double kD = 0.0010000000474974513;
 
     // Feedforward gains
     public static final double kS = 0.0; // Static friction
