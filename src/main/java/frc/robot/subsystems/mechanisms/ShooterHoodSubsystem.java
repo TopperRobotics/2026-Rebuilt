@@ -53,6 +53,11 @@ public class ShooterHoodSubsystem extends SubsystemBase {
 
         config.smartCurrentLimit(40, 40);
 
+        config.closedLoopRampRate(0.5);
+
+        config.softLimit.forwardSoftLimit(0);
+        config.softLimit.reverseSoftLimit(-35);
+
         // Apply configuration to motor
         hoodMotor.configure(
                 config,
@@ -69,6 +74,8 @@ public class ShooterHoodSubsystem extends SubsystemBase {
         //SmartDashboard.putNumber("Shooter Hood/Distance From Target", 0.0);
     }
 
+    // this isn't working, the motor is giving up after around a second and the output current falls to 0
+    // TODO: replace the breaker on the pdp
     public void setHoodPosition(double positionDegrees) {
         hoodPID.setSetpoint(positionDegrees, SparkBase.ControlType.kPosition);
     }
@@ -130,7 +137,7 @@ public class ShooterHoodSubsystem extends SubsystemBase {
     public void autoAdjustHood(){
         //determineDistanceFromTarget();
         determineHoodAngle();
-        moveToPosition(-neededHoodAngle);
+        setHoodPosition(-neededHoodAngle);
     }
 
     public Command moveToPosition(Rotation2d goal) {
@@ -163,5 +170,6 @@ public class ShooterHoodSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Shooter Hood/Current Position", hoodMotorEncoder.getPosition());
         SmartDashboard.putNumber("Shooter Hood/Current", hoodMotor.getOutputCurrent());
         SmartDashboard.putNumber("Shooter Hood/Temperature", hoodMotor.getMotorTemperature());
+        SmartDashboard.putNumber("Shooter Hood/PID Setpoint", hoodPID.getSetpoint());
     }
 }

@@ -6,37 +6,50 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import swervelib.SwerveDrive;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-    // bang bang
+    private final double gravity = 9.81;
+    private final double hoodAngle = Math.toRadians(10.0);
+    private final double robotHopperHeightDifference = 1.777998984; // Meters (Target Height - Shooter Height)
+    private final double flywheelRadius = 0.0762; // 3 inches in meters
+    
     double desiredFlywheelSpeed;
+    double distanceFromTarget = 0.000;
+    Translation2d hopperPosition = new Translation2d();
+    Translation2d[] hopperPositions;
+    SwerveSubsystem swerveSubsystem;
+    
     SparkFlex shooterMotor = new SparkFlex(16, MotorType.kBrushless);
     RelativeEncoder shooterMotorEncoder = shooterMotor.getEncoder();
     SparkMax beltMotor = new SparkMax(14, MotorType.kBrushless);
     SparkMax feederMotor = new SparkMax(15, MotorType.kBrushless);
 
-    public ShooterSubsystem() {
-        this.desiredFlywheelSpeed = 50.96; // the ball needs to be launched at 8 m/s, with the formula v_ball = 1/2 RPM
-                                           // * 2pi/60 * 3 (radius of wheel), which is rpm = 20 * v_ball / 60, we get 50.96 as the needed rpm
+    public ShooterSubsystem(Translation2d[] hopperPositions, SwerveSubsystem swerveSubsystem) {
+        this.hopperPositions = hopperPositions;
+        this.swerveSubsystem = swerveSubsystem;
+        
         SparkMaxConfig config = new SparkMaxConfig();
         config.idleMode(IdleMode.kCoast);
         shooterMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
         feederMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
         beltMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
+        
+        this.desiredFlywheelSpeed = 50.96; 
     }
 
-    public void setDesiredFlywheelSpeed(double speed) {
-        this.desiredFlywheelSpeed = speed;
-    }
-
-    public void run() {
+    public void run() { // bang bang
         if (shooterMotorEncoder.getVelocity() < desiredFlywheelSpeed) {
-            shooterMotor.set(-1);
+            shooterMotor.set(-1); // motor is inverted
         } else {
             shooterMotor.stopMotor();
         }
@@ -51,8 +64,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command shoot(double desiredSpeed){
         this.desiredFlywheelSpeed = desiredSpeed;
         return runOnce(() -> {
-            //run();
-            shooterMotor.set(desiredSpeed);
+            run();
         });
     }
 
@@ -69,10 +81,8 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public Command shoot(){
-        this.desiredFlywheelSpeed = 50.96;
         return runOnce(() -> {
-            //run();
-            shooterMotor.set(1);
+            run();
         });
     }
 
@@ -110,6 +120,70 @@ public class ShooterSubsystem extends SubsystemBase {
         return runOnce(() -> {
             stop();
         });
+    }
+
+    // x is robot pose x, y is robot pose y, this method will return the closest hopper position to the robot, which will be used to determine the distance from the target
+    public Translation2d determineClosestTranslation2d(Translation2d[] translations, double x, double y) { 
+                if (translations == null || translations.length == 0) {
+                        System.out.println("shooterhoodsubsystem determineclosesttranslation2d translations parameter null or empty");
+                        return null;
+                }
+
+                Translation2d closest = translations[0];
+                double minDistSq = Math.pow(closest.getX() - x, 2) + Math.pow(closest.getY() - y, 2);
+
+                for (int i = 1; i < translations.length; i++) {
+                        Translation2d current = translations[i];
+                        double distSq = Math.pow(current.getX() - x, 2) + Math.pow(current.getY() - y, 2);
+                        if (distSq < minDistSq) {
+                                minDistSq = distSq;
+                                closest = current;
+                        }
+                }
+
+                return closest;
+        }
+
+    public void determineDistanceFromTarget() {
+        Pose2d robotPose2d = swerveSubsystem.getPose();
+        // Update the hopper we are actually looking at based on current robot position
+        this.hopperPosition = determineClosestTranslation2d(hopperPositions, robotPose2d.getX(), robotPose2d.getY());
+        
+        this.distanceFromTarget = hopperPosition.getDistance(robotPose2d.getTranslation());
+    }
+
+    public void determineNeededFlywheelSpeedDistanceBased() {
+        // Projectile Motion Equation for Exit Velocity (v):
+        // v = sqrt( (g * d^2) / (2 * cos^2(theta) * (d * tan(theta) - h)) )
+        
+        double d = this.distanceFromTarget;
+        double h = robotHopperHeightDifference;
+        double theta = hoodAngle;
+
+        // Calculate required exit velocity in m/s
+        double numerator = gravity * Math.pow(d, 2);
+        double denominator = 2 * Math.pow(Math.cos(theta), 2) * (d * Math.tan(theta) - h);
+
+        if (denominator <= 0) {
+            // Robot is either too close or the math is impossible for this angle
+            return;
+        }
+
+        double vBall = Math.sqrt(numerator / denominator);
+
+        // Convert vBall (m/s) to RPM using your provided formula:
+        // RPM = (vBall * 2 * 60) / (2 * PI * radius)
+        this.desiredFlywheelSpeed = (vBall * 120.0) / (2 * Math.PI * flywheelRadius);
+    }
+
+    @Override
+    public void periodic() {
+        determineDistanceFromTarget();
+        determineNeededFlywheelSpeedDistanceBased();
+        
+        // Optional: Send data to SmartDashboard to debug
+        SmartDashboard.putNumber("Distance to Target", distanceFromTarget);
+        SmartDashboard.putNumber("Desired RPM", desiredFlywheelSpeed);
     }
 
 }

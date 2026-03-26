@@ -87,7 +87,7 @@ public class RobotContainer {
          */
         public RobotContainer() {
                 intake = new IntakeSubsystem();
-                shooter = new ShooterSubsystem();
+                shooter = new ShooterSubsystem(new Translation2d[]{Constants.FieldConstants.kLeftHopper, Constants.FieldConstants.kRightHopper}, drivebase);
 
                 CameraServer.startAutomaticCapture();
                 NamedCommands.registerCommand("DeployIntake", intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
@@ -130,7 +130,7 @@ public class RobotContainer {
 
                 // secondDriverXbox.rightTrigger().whileTrue(driveRobotOriented); // yagsl's robot oriented driving is very buggy
 
-                driverXbox.rightTrigger().whileTrue(shooter.shoot(-0.6).andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
+                driverXbox.rightTrigger().whileTrue(shooter.shoot().andThen(new WaitCommand(0.4)).andThen(shooter.runFeeder()).andThen(shooter.runConveyor()));
                 driverXbox.rightTrigger().onFalse(shooter.stopShooting());
 
                 driverXbox.a().onTrue(intake.moveToPosition(Constants.intakeArm.deployedPosition, false));
