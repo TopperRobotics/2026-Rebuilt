@@ -54,11 +54,11 @@ public class ShooterSubsystem extends SubsystemBase {
         
         // Configure PID controller settings
         config.closedLoop
-            .pid(Constants.shooter.kP, Constants.shooter.kI, Constants.shooter.kD)
-            .feedForward
-            .kS(Constants.shooter.kS)
-            .kV(Constants.shooter.kV)
-            .kA(Constants.shooter.kA);
+            .pid(Constants.shooter.kP, Constants.shooter.kI, Constants.shooter.kD);
+            // .feedForward
+            // .kS(Constants.shooter.kS)
+            // .kV(Constants.shooter.kV)
+            // .kA(Constants.shooter.kA);
 
         shooterMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
         
@@ -68,11 +68,17 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void run() {
-        shooterPID.setSetpoint(desiredFlywheelSpeed, ControlType.kVelocity);
+        if(shooterMotorEncoder.getVelocity() > desiredFlywheelSpeed){
+            shooterMotor.set(-1);
+        } else {
+            shooterMotor.set(0);
+        }
+        //shooterPID.setSetpoint(desiredFlywheelSpeed, ControlType.kVelocity);
     }
 
     public void stop() {
-        shooterPID.setSetpoint(0, ControlType.kVelocity);
+        //shooterPID.setSetpoint(0, ControlType.kVelocity);
+        shooterMotor.stopMotor();
         beltMotor.stopMotor();
         feederMotor.stopMotor();
     }
