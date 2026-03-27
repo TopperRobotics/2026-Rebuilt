@@ -2,6 +2,7 @@ package frc.robot.subsystems.mechanisms;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -45,31 +46,33 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // Configure encoder settings
         config.encoder
-            .positionConversionFactor(360.0 / 1)
-            .velocityConversionFactor((360.0 / 1) / 60.0);
-        
-        // Configure PID controller settings
-        config.closedLoop
-            .pid(0.01, 0, 0);
+            .positionConversionFactor(360.0 / Constants.shooter.gearRatio)
+            .velocityConversionFactor((360.0 / Constants.shooter.gearRatio) / 60.0);
 
-        shooterMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
         feederMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
         beltMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
         
+        // Configure PID controller settings
+        config.closedLoop
+            .pid(Constants.shooter.kP, Constants.shooter.kI, Constants.shooter.kD)
+            .feedForward
+            .kS(Constants.shooter.kS)
+            .kV(Constants.shooter.kV)
+            .kA(Constants.shooter.kA);
+
+        shooterMotor.configure(config, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
+        
+        shooterPID = shooterMotor.getClosedLoopController();
 
         desiredFlywheelSpeed = 50.96; 
     }
 
-    public void run() { // bang bang
-        if (shooterMotorEncoder.getVelocity() > desiredFlywheelSpeed) {
-            shooterMotor.set(-1); // motor is inverted
-        } else {
-            shooterMotor.stopMotor();
-        }
+    public void run() {
+        shooterPID.setSetpoint(desiredFlywheelSpeed, ControlType.kVelocity);
     }
 
     public void stop() {
-        shooterMotor.stopMotor();
+        shooterPID.setSetpoint(0, ControlType.kVelocity);
         beltMotor.stopMotor();
         feederMotor.stopMotor();
     }

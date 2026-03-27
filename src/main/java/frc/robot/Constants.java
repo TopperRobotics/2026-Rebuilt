@@ -34,7 +34,7 @@ public final class Constants {
                                                                    // for fun
   public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED = Units.feetToMeters(20);
+  public static final double MAX_SPEED = Units.feetToMeters(5);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
   public static final String LIMELIGHT_FRONT_IP_ADDRESS = "10.39.84.11"; 
@@ -108,10 +108,6 @@ public final class Constants {
     public static final Rotation2d halfDeployedPosition = new Rotation2d(Math.toRadians(45));
   }
 
-  public static final class shooter {
-
-  }
-
   public static final class shooterHood {
     public static final double gearRatio = 3.0;
 
@@ -154,5 +150,17 @@ public final class Constants {
     public static final double tolerance = 0;
     public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(0.0));
     public static final Rotation2d extendedPosition = new Rotation2d(Math.toRadians(1219.0152587890625));
+  }
+
+  public static final class shooter {
+    public static final double gearRatio = 1.0;
+    public static final double kP = 0.1;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double kF = 0.0;
+    public static final double tolerance = 0.0;
+    public static final double kV = 0.33;
+    public static final double kA = 0.55;
+    public static final double kS = 0.5;
   }
 }
