@@ -25,7 +25,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomLeaveCenter"
+            "pathName": "BottomGetBalls"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunShooterDistanceBased"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
           }
         }
       ]
