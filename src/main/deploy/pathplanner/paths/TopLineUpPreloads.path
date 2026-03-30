@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.468050213675214,
-        "y": 7.427
+        "x": 3.55,
+        "y": 6.34
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1459149438904954,
-        "y": 6.854527983066607
+        "x": 3.29912311862322,
+        "y": 6.214776489483116
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.1422435897435896,
-        "y": 5.262425213675214
+        "x": 3.0,
+        "y": 6.0
       },
       "prevControl": {
-        "x": 2.7258659675873447,
-        "y": 6.153554869380326
+        "x": 3.035828739671359,
+        "y": 6.289877480398708
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -27.0
+    "rotation": -53.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "OrbitInspiredAutonCommands",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

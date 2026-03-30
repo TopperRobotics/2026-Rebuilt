@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopShootPreloadAndIntakeFromDepotPart1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunShooterDistanceBased"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopPreloadAndGoToDepotPart2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DriveThroughDepot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopLineUpPreloads"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunShooterDistanceBased"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.75
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopGetCenterBalls"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopLeaveCenter"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunShooterDistanceBased"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.75
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GoToDepotAtTheEnd"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

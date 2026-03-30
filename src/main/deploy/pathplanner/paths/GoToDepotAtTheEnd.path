@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.468050213675214,
-        "y": 7.427
+        "x": 3.077871198568873,
+        "y": 5.75
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1459149438904954,
-        "y": 6.854527983066607
+        "x": 2.190733891074544,
+        "y": 5.222858498404575
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.1422435897435896,
-        "y": 5.262425213675214
+        "x": 0.6116100178890873,
+        "y": 5.9414847942754925
       },
       "prevControl": {
-        "x": 2.7258659675873447,
-        "y": 6.153554869380326
+        "x": 0.8765296228358682,
+        "y": 5.967853651588661
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,26 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "DeployIntake",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "RunIntakeRollers",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "StopIntakeRollers",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -42,13 +61,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -27.0
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "OrbitInspiredAutonCommands",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -53.0
   },
   "useDefaultConstraints": true
 }

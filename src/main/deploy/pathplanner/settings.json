@@ -5,6 +5,7 @@
   "pathFolders": [
     "MiddleShootPreloadAndIntakeFromCenterAndShootPaths",
     "MiddleShootPreloadAndIntakePaths",
+    "OrbitInspiredAutonCommands",
     "TopShootPreloadAndIntakeFromDepotPaths"
   ],
   "autoFolders": [
