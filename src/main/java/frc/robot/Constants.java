@@ -86,7 +86,7 @@ public final class Constants {
     public static final double gearRatio = 48.0;
 
     // PID gains
-    public static final double kP = 0.005;
+    public static final double kP = 0.009;
     public static final double kI = 0.0;
     public static final double kD = 0.0001;
 
@@ -104,8 +104,8 @@ public final class Constants {
     public static final double velocityTolerance = 1.0; // Velocity tolerance in deg/sec
 
     public static final Rotation2d retractedPosition = new Rotation2d(Math.toRadians(1));
-    public static final Rotation2d deployedPosition = new Rotation2d(Math.toRadians(90.0));
-    public static final Rotation2d halfDeployedPosition = new Rotation2d(Math.toRadians(45));
+    public static final Rotation2d deployedPosition = new Rotation2d(Math.toRadians(70.0));
+    public static final Rotation2d halfDeployedPosition = new Rotation2d(Math.toRadians(50));
   }
 
   public static final class shooterHood {
