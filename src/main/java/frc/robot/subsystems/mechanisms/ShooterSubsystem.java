@@ -34,15 +34,15 @@ public class ShooterSubsystem extends SubsystemBase {
     SparkFlex shooterMotor = new SparkFlex(16, MotorType.kBrushless);
     RelativeEncoder shooterMotorEncoder = shooterMotor.getEncoder();
     SparkClosedLoopController shooterPID;
-    SparkMax beltMotor = new SparkMax(14, MotorType.kBrushless);
-    SparkMax feederMotor = new SparkMax(15, MotorType.kBrushless);
+    SparkMax beltMotor = new SparkMax(12, MotorType.kBrushless);
+    SparkMax feederMotor = new SparkMax(14, MotorType.kBrushless);
 
     public ShooterSubsystem(Translation2d[] hopperPositions, SwerveSubsystem swerveSubsystem) {
         this.hopperPositions = hopperPositions;
         this.swerveSubsystem = swerveSubsystem;
         
         SparkMaxConfig config = new SparkMaxConfig();
-        config.idleMode(IdleMode.kCoast);
+        config.idleMode(IdleMode.kBrake);
 
         // Configure encoder settings
         config.encoder
@@ -69,7 +69,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void run() {
         if(shooterMotorEncoder.getVelocity() > desiredFlywheelSpeed){
-            shooterMotor.set(-1);
+            shooterMotor.set(1);
         } else {
             shooterMotor.set(0);
         }

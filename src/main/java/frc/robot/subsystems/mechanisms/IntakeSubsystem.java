@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
-    
+
     // Motor controllers and related objects
     private SparkMax intakeArmLeftMotor;
     private RelativeEncoder intakeArmLeftMotorEncoder;
@@ -25,88 +25,86 @@ public class IntakeSubsystem extends SubsystemBase {
     private SparkClosedLoopController intakeArmLeftMotorPID;
     private SparkClosedLoopController intakeArmRightMotorPID;
     private SparkMax intakeRollerMotor;
+
     private enum IntakeArmState {
         IN, OUT
     }
+
     private IntakeArmState currentIntakeArmState = IntakeArmState.OUT;
 
     public IntakeSubsystem() {
         // Initialize intake arm motor
         intakeArmLeftMotor = new SparkMax(
-            8,
-            MotorType.kBrushless
-        );
+                11,
+                MotorType.kBrushless);
 
         intakeArmRightMotor = new SparkMax(
-            11,
-            MotorType.kBrushless
-        );
-        
+                8,
+                MotorType.kBrushless);
+
         // Initialize intake roller motors
-        intakeRollerMotor = new SparkMax(12, MotorType.kBrushless);
+        intakeRollerMotor = new SparkMax(13, MotorType.kBrushless);
 
         // Configure motor settings using SparkMaxConfig
         SparkMaxConfig config = new SparkMaxConfig();
         config
-            .idleMode(IdleMode.kBrake);
-        
+                .idleMode(IdleMode.kBrake);
+
         // Configure encoder settings
         config.encoder
-            .positionConversionFactor(360.0 / Constants.intakeArm.gearRatio)
-            .velocityConversionFactor((360.0 / Constants.intakeArm.gearRatio) / 60.0);
-        
+                .positionConversionFactor(360.0 / Constants.intakeArm.gearRatio)
+                .velocityConversionFactor((360.0 / Constants.intakeArm.gearRatio) / 60.0);
+
         // Configure PID controller settings
         config.closedLoop
-            .pid(Constants.intakeArm.kP, Constants.intakeArm.kI, Constants.intakeArm.kD);
-        
+                .pid(Constants.intakeArm.kP, Constants.intakeArm.kI, Constants.intakeArm.kD);
+
         config.inverted(true);
-        
+
         // Apply configuration to left motor
         intakeArmLeftMotor.configure(
-            config, 
-            SparkMax.ResetMode.kResetSafeParameters, 
-            SparkMax.PersistMode.kPersistParameters
-        );
+                config,
+                SparkMax.ResetMode.kResetSafeParameters,
+                SparkMax.PersistMode.kPersistParameters);
 
         // Apply configuration to right motor
         intakeArmRightMotor.configure(
-            config, 
-            SparkMax.ResetMode.kResetSafeParameters, 
-            SparkMax.PersistMode.kPersistParameters
-        );
-        
+                config,
+                SparkMax.ResetMode.kResetSafeParameters,
+                SparkMax.PersistMode.kPersistParameters);
+
         // Get encoder and PID references after configuration
         intakeArmLeftMotorEncoder = intakeArmLeftMotor.getEncoder();
         intakeArmLeftMotorPID = intakeArmLeftMotor.getClosedLoopController();
 
         intakeArmRightMotorEncoder = intakeArmRightMotor.getEncoder();
         intakeArmRightMotorPID = intakeArmRightMotor.getClosedLoopController();
-        
+
         // Reset encoder position to zero
         intakeArmLeftMotorEncoder.setPosition(0);
         intakeArmRightMotorEncoder.setPosition(0);
     }
-    
+
     // COMMANDS FOR INTAKE ROLLERS
-    
+
     /**
      * Command to expel game piece from intake
      */
     public Command out() {
-         return run(() -> {
-            intakeRollerMotor.set(1); 
-         });
+        return run(() -> {
+            intakeRollerMotor.set(-1);
+        });
     }
-    
+
     /**
      * Command to intake game piece
      */
     public Command in() {
         return run(() -> {
-            intakeRollerMotor.set(-0.75); 
+            intakeRollerMotor.set(1);
         });
     }
-    
+
     /**
      * Command to stop intake rollers
      */
@@ -117,7 +115,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     // ARM POSITION METHODS
-    
+
     /**
      * Get current arm position as Rotation2d
      */
@@ -128,9 +126,10 @@ public class IntakeSubsystem extends SubsystemBase {
     public Rotation2d getPositionRight() {
         return Rotation2d.fromDegrees(intakeArmRightMotorEncoder.getPosition());
     }
-    
+
     /**
      * Calculate error between current position and goal position
+     * 
      * @param goal Target position
      * @return Error as Rotation2d
      */
@@ -142,6 +141,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     /**
      * Stops the arm wherever it is
+     * 
      * @return
      */
     public Command stopArm() {
@@ -157,24 +157,26 @@ public class IntakeSubsystem extends SubsystemBase {
             moveToPosition(new Rotation2d(Math.toRadians(setPoint)), false);
         });
     }
-    
+
     /**
      * Run PID controller to move arm to target position
+     * 
      * @param goal Target position in degrees
      */
     public void goToPosition(Rotation2d goal) {
-        if(goal == Constants.intakeArm.deployedPosition){
+        if (goal == Constants.intakeArm.deployedPosition) {
             currentIntakeArmState = IntakeArmState.OUT;
-        } else if (goal == Constants.intakeArm.retractedPosition){
+        } else if (goal == Constants.intakeArm.retractedPosition) {
             currentIntakeArmState = IntakeArmState.IN;
         }
         intakeArmLeftMotorPID.setSetpoint(goal.getDegrees(), SparkBase.ControlType.kPosition);
         intakeArmRightMotorPID.setSetpoint(goal.getDegrees(), SparkBase.ControlType.kPosition);
     }
-    
+
     /**
      * Command to move arm to target position with optional intake activation
-     * @param goal Target position
+     * 
+     * @param goal        Target position
      * @param startIntake Whether to run intake when position is reached
      * @return Command sequence
      */
@@ -182,26 +184,22 @@ public class IntakeSubsystem extends SubsystemBase {
         return runOnce(() -> {
             // Log goal position to SmartDashboard for debugging
             SmartDashboard.putNumber("Intake/Goal Position", goal.getDegrees());
-            //goToPosition(goal); // REMOVE THIS IS FOR DEBUGGING ONLY
+            // goToPosition(goal); // REMOVE THIS IS FOR DEBUGGING ONLY
         })
-        .andThen(
-            // Run PID controller until position is reached
-            run(() -> goToPosition(goal))
-                .until(() -> 
-                    Math.abs(getError(goal).getDegrees()) < Constants.intake.tolerance
-                )
-                // Timeout safety: stop after 1 second if position not reached
-                .withTimeout(1.0)
-        )
-        .andThen(
-            // After reaching position, optionally start intake
-            startIntake ? in() : stop()
-        );
+                .andThen(
+                        // Run PID controller until position is reached
+                        run(() -> goToPosition(goal))
+                                .until(() -> Math.abs(getError(goal).getDegrees()) < Constants.intake.tolerance)
+                                // Timeout safety: stop after 1 second if position not reached
+                                .withTimeout(1.0))
+                .andThen(
+                        // After reaching position, optionally start intake
+                        startIntake ? in() : stop());
     }
 
-    public Command toggleIntakeArmDeployment(){
+    public Command toggleIntakeArmDeployment() {
         return runOnce(() -> {
-            if(currentIntakeArmState == IntakeArmState.OUT){
+            if (currentIntakeArmState == IntakeArmState.OUT) {
                 goToPosition(Constants.intakeArm.retractedPosition);
                 currentIntakeArmState = IntakeArmState.IN;
             } else {
@@ -211,14 +209,18 @@ public class IntakeSubsystem extends SubsystemBase {
         });
     }
 
-    public void toggleIntakeOutness(){
-        if(getPositionLeft().getDegrees() > Constants.intakeArm.retractedPosition.getDegrees()){
-            runOnce(() -> {moveToPosition(Constants.intakeArm.deployedPosition, false);});
+    public void toggleIntakeOutness() {
+        if (getPositionLeft().getDegrees() > Constants.intakeArm.retractedPosition.getDegrees()) {
+            runOnce(() -> {
+                moveToPosition(Constants.intakeArm.deployedPosition, false);
+            });
         } else {
-            runOnce(() -> {moveToPosition(Constants.intakeArm.retractedPosition, false);});
+            runOnce(() -> {
+                moveToPosition(Constants.intakeArm.retractedPosition, false);
+            });
         }
     }
-    
+
     // PERIODIC METHOD
     @Override
     public void periodic() {
@@ -228,8 +230,10 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Intake/Target Left Motor", intakeArmLeftMotorPID.getSetpoint());
         SmartDashboard.putNumber("Intake/Target Right Motor", intakeArmLeftMotorPID.getSetpoint());
         // Optional: Add more debugging info
-        // SmartDashboard.putNumber("Intake/Error", getError(getPosition()).getDegrees());
-        // SmartDashboard.putBoolean("Intake/At Setpoint", 
-        //     Math.abs(getError(getPosition()).getDegrees()) < Constants.Swerve.intake.tolerance);
+        // SmartDashboard.putNumber("Intake/Error",
+        // getError(getPosition()).getDegrees());
+        // SmartDashboard.putBoolean("Intake/At Setpoint",
+        // Math.abs(getError(getPosition()).getDegrees()) <
+        // Constants.Swerve.intake.tolerance);
     }
 }
